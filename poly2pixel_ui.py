@@ -22,6 +22,9 @@ class Ui_MainWindow(object):
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setWordWrap(True)
         self.label.setObjectName("label")
+        self.loadPoly = QtWidgets.QPushButton(self.centralwidget)
+        self.loadPoly.setGeometry(QtCore.QRect(0, 40, 111, 23))
+        self.loadPoly.setObjectName("loadPoly")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 20))
@@ -39,6 +42,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.browseBtn.setText(_translate("MainWindow", "Load SA project"))
         self.label.setText(_translate("MainWindow", "TextLabel"))
+        self.loadPoly.setText(_translate("MainWindow", "Load Polygons"))
 
 
 if __name__ == "__main__":

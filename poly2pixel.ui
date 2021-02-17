@@ -46,6 +46,19 @@
      <bool>true</bool>
     </property>
    </widget>
+   <widget class="QPushButton" name="loadPoly">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>40</y>
+      <width>111</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Load Polygons</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
