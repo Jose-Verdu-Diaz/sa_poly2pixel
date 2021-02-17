@@ -1,3 +1,7 @@
+######################################################################
+##            github.com/Jose-Verdu-Diaz/sa_poly2pixel              ##
+######################################################################
+
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QLabel, QGridLayout
@@ -6,12 +10,6 @@ import glob
 import json
 
 from poly2pixel_ui import *
-
-# Stores project data
-class Project:
-    def __init__(self, images, classes):
-        self.images = images
-        self.classes = classes
 
 # Stores image data found in images/images.sa
 class Image:
@@ -41,6 +39,12 @@ class Class:
         self.color
         self.id
         self.name
+
+# Stores project data
+class Project:
+    def __init__(self, images:Image, classes:Class = None):
+        self.images = images
+        self.classes = classes
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
@@ -80,7 +84,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                     print(image["name"])
                     images.append(Image(image["srcPath"],image["name"],image["imagePath"],image["thumbPath"]))
 
-                self.project = Project(images)
+                self.project = Project(images = images)
 
             '''
             for filename in glob.glob(self.projectDir + '/images/*.jpg'):
