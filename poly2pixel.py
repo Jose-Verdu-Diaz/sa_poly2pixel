@@ -1,106 +1,77 @@
-######################################################################
-##            github.com/Jose-Verdu-Diaz/sa_poly2pixel              ##
-######################################################################
-
-import sys
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QLabel, QGridLayout
-from PyQt5.QtGui import QPixmap
-import glob
 import json
+import tkinter as tk
+from tkinter import filedialog
 
-from poly2pixel_ui import *
+from models.project import Project
+from models.class_ import Class_
+from models.point import Point
+from models.polygon import Polygon
+from models.image import Image
 
-# Stores image data found in images/images.sa
-class Image:
-    def __init__(self, srcPath, name, imagePath, thumbPath):
-        self.srcPath = srcPath
-        self.name = name
-        self.imagePath = imagePath
-        self.thumbPath = thumbPath
-        self.polygons = []
+project = Project()
 
-    def setPoly(self, polygons):
-        self.polygons = polygons
+def openFileNameDialog():
 
-# Defines a 2D point
-class Point:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+    # Directory explorer
+    root = tk.Tk()
+    root.withdraw()
 
-class Polygon:
-    def __init__(self, classId, points):
-        self.classId = classId
-        self.points = points
-
-class Class:
-    def __init__(self, color, id, name):
-        self.color
-        self.id
-        self.name
-
-# Stores project data
-class Project:
-    def __init__(self, images:Image, classes:Class = None):
-        self.images = images
-        self.classes = classes
-
-class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
-
-    def __init__(self, *args, **kwargs):
-        QtWidgets.QMainWindow.__init__(self, *args, **kwargs)
-        self.setupUi(self)
-        
-        # SA project dir
-        self.projectDir = ""
-
-        self.project = None
-
-        self.label.setText("")
-
-        self.browseBtn.setText("Presióname")
-        self.browseBtn.clicked.connect(self.openFileNameDialog)
-
-        self.loadPoly.clicked.connect(self.loadPolyJSON)
-
-        self.show()
-
-    # Open dialog for locating the SA project folder
-    def openFileNameDialog(self):
-        dlg = QFileDialog()
-        dlg.setFileMode(QFileDialog.DirectoryOnly)		
-        if dlg.exec_():
-            filenames = dlg.selectedFiles()
-            print(filenames[0])
-            self.projectDir = filenames[0]
-
-            with open(self.projectDir + '/images/images.sa') as f:
-                data = json.load(f)
-
-                images = []
-
-                for image in data:
-                    print(image["name"])
-                    images.append(Image(image["srcPath"],image["name"],image["imagePath"],image["thumbPath"]))
-
-                self.project = Project(images = images)
-
-            '''
-            for filename in glob.glob(self.projectDir + '/images/*.jpg'):
-                print(filename)
-                self.img_routes.append(filename)
-                im = QPixmap(filename)
-                image_list.append(im)
-                self.label.setPixmap(im)
-            '''
+    project.projectDir = filedialog.askdirectory()
     
-    def loadPolyJSON(self):
-        with open(self.projectDir + '/annotations.json') as f:
-            data = json.load(f)
+    # Debug dir (avoid VScode error with tkinter)
+    # project.projectDir = "/home/pepv/Practiques/Segm/Software/Test_json"
+
+    # Load images.sa
+    with open(project.projectDir + '/images/images.sa') as f:
+        data = json.load(f)
+
+        images = []
+
+        for d in data:
+            images.append(Image(d["srcPath"],d["name"],d["imagePath"],d["thumbPath"]))
+
+        project.images = images
+
+    # Load classes.json
+    with open(project.projectDir + '/classes.json') as f:
+        data = json.load(f)
+
+        classes = []
+
+        for d in data:
+            classes.append(Class_(d["color"],d["id"],d["name"]))
+        
+        project.classes = classes
+
+    # Load annotations.jason
+    with open(project.projectDir + '/annotations.json') as f:
+        data = json.load(f)
+
+        # Foreach image
+        for i in project.images:
+
+            # If image present on annotations.jason
+            if i.name in data:
+
+                polygons = []
+
+                # Foreach polygon
+                for poly in data[i.name]["instances"]:
+                    pointArray = poly["points"]
+                    points = []
+
+                    # Group points in pairs
+                    for k in range(0, len(pointArray), 2):
+                        points.append(Point(pointArray[k:k + 2]))
+
+                    polygons.append(Polygon(poly["classId"], points))
+            
+            i.polygons = polygons
                 
+
+                
+def main():
+    openFileNameDialog()
+
 if __name__ == "__main__":
-    app = QtWidgets.QApplication([])
-    window = MainWindow()
-    window.show()
-    app.exec_()
+    main()
