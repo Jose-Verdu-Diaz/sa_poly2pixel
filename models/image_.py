@@ -1,4 +1,4 @@
-class Image:
+class Image_:
     def __init__(self, srcPath, name, imagePath, thumbPath):
         self.srcPath = srcPath
         self.name = name
