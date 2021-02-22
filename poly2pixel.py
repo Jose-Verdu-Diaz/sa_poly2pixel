@@ -91,7 +91,7 @@ def createMask(img):
 
         draw.polygon(poly.points,fill = colorRGB,outline = colorRGB)
 
-    back.save('masks/'+ project.name +'/mask_'+ img.name, quality=100)
+    back.save('masks/'+ project.name +'/mask_'+ img.name, quality=100, subsampling=0)
 
 def main():
     loadProject()
