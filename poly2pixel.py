@@ -91,7 +91,35 @@ def createMask(img):
 
         draw.polygon(poly.points,fill = colorRGB,outline = colorRGB)
 
-    back.save('masks/'+ project.name +'/mask_'+ img.name, quality=100, subsampling=0)
+    back.save('masks/'+ project.name +'/mask_'+ img.name + '.bmp', quality=100, subsampling=0)
+
+def createProjectJson():
+    projectJson = {'images' : [] , 'classes' : [], 'projectDir' : project.projectDir, 'name' : project.name}
+
+    # Foreach image
+    for img in project.images:
+
+        # Foreach polygon of the image
+        polygonsJson = []
+        for poly in img.polygons:
+
+            # Foreach point of the polygon
+            points = []
+            for point in poly.points:
+                points.append({'x' : point[0], 'y' : point[1]})
+
+            polygonsJson.append({'classId' : poly.classId, 'points' : points})
+
+        # Add images to json
+        projectJson['images'].append({ 'srcPath' : img.srcPath, 'name' : img.name, 'imagePath' : img.imagePath, 'thumbPath' : img.thumbPath, 'polygons' : polygonsJson}) 
+
+    # Foreach class
+    for class_ in project.classes:
+        projectJson['classes'].append({ 'id' : class_.id, 'color' : class_.color, 'name' : class_.name}) 
+
+
+    with open('data.json', 'w', encoding='utf-8') as f:
+        json.dump(projectJson, f, ensure_ascii=False, indent=4)
 
 def main():
     loadProject()
@@ -101,6 +129,8 @@ def main():
 
     for img in project.images:
         createMask(img)
+    
+    createProjectJson()
 
 if __name__ == "__main__":
     main()
