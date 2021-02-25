@@ -6,32 +6,33 @@ import json
 import tkinter as tk
 from tkinter import filedialog
 from PIL import Image, ImageDraw
-import numpy as np
-from numpy.lib.type_check import imag
 
 from models.project import Project
 from models.class_ import Class_
 from models.polygon import Polygon
 from models.image_ import Image_
 
-project = Project()
+project = None
 
+# Show file browser and load SuperAnnotate project (create project object)
 def loadProject():
+
+    prj = Project()
 
     # Directory explorer
     root = tk.Tk()
     root.withdraw()
 
-    project.projectDir = filedialog.askdirectory()
+    prj.projectDir = filedialog.askdirectory()
 
-    name = project.projectDir.split('/')
-    project.name = name[len(name) - 1]
+    name = prj.projectDir.split('/')
+    prj.name = name[len(name) - 1]
     
     # Debugging placeholder dir [Only for testing]
     #project.projectDir = "/home/pepv/Practiques/Segm/Software/MRI"
 
     # Load images.sa
-    with open(project.projectDir + '/images/images.sa') as f:
+    with open(prj.projectDir + '/images/images.sa') as f:
         data = json.load(f)
 
         images = []
@@ -39,10 +40,10 @@ def loadProject():
         for d in data:
             images.append(Image_(d["srcPath"],d["name"],d["imagePath"],d["thumbPath"]))
 
-        project.images = images
+        prj.images = images
 
     # Load classes.json
-    with open(project.projectDir + '/classes.json') as f:
+    with open(prj.projectDir + '/classes.json') as f:
         data = json.load(f)
 
         classes = []
@@ -50,14 +51,14 @@ def loadProject():
         for d in data:
             classes.append(Class_(d["color"],d["id"],d["name"]))
         
-        project.classes = classes
+        prj.classes = classes
 
     # Load annotations.jason
-    with open(project.projectDir + '/annotations.json') as f:
+    with open(prj.projectDir + '/annotations.json') as f:
         data = json.load(f)
 
         # Foreach image
-        for i in project.images:
+        for i in prj.images:
 
             # If image present on annotations.jason
             if i.name in data:
@@ -75,29 +76,35 @@ def loadProject():
                     polygons.append(Polygon(poly["classId"], points))
             
             i.polygons = polygons
-                
 
-def createMask(img):
-    image = Image.open(img.imagePath)
-    back = Image.new('RGB', (image.size[0],image.size[1]), (0, 0, 0))
-    draw = ImageDraw.Draw(back)
+    return prj             
 
-    for poly in img.polygons:
+# Create image masks from the project object
+def createMask(prj):
 
-        # Get hex color and strip '#'
-        colorHex = project.classes[poly.classId - 1].color.lstrip('#')
-        # Convert hex color to rgb
-        colorRGB = tuple(int(colorHex[i:i+2], 16) for i in (0, 2, 4))
+    for img in prj.images:
 
-        draw.polygon(poly.points,fill = colorRGB,outline = colorRGB)
+        image = Image.open(img.imagePath)
+        back = Image.new('RGB', (image.size[0],image.size[1]), (0, 0, 0))
+        draw = ImageDraw.Draw(back)
 
-    back.save('masks/'+ project.name +'/img/mask_'+ img.name + '.bmp', quality=100, subsampling=0)
+        for poly in img.polygons:
 
-def createProjectJson():
-    projectJson = {'projectDir' : project.projectDir, 'name' : project.name, 'images' : [] , 'classes' : []}
+            # Get hex color and strip '#'
+            colorHex = prj.classes[poly.classId - 1].color.lstrip('#')
+            # Convert hex color to rgb
+            colorRGB = tuple(int(colorHex[i:i+2], 16) for i in (0, 2, 4))
+
+            draw.polygon(poly.points,fill = colorRGB,outline = colorRGB)
+
+        back.save('masks/'+ prj.name +'/img/mask_'+ img.name + '.bmp', quality=100, subsampling=0)
+
+# Create a json file from projec object
+def createProjectJson(prj):
+    projectJson = {'projectDir' : prj.projectDir, 'name' : prj.name, 'images' : [] , 'classes' : []}
 
     # Foreach image
-    for img in project.images:
+    for img in prj.images:
 
         # Foreach polygon of the image
         polygonsJson = []
@@ -114,25 +121,27 @@ def createProjectJson():
         projectJson['images'].append({ 'srcPath' : img.srcPath, 'name' : img.name, 'imagePath' : img.imagePath, 'thumbPath' : img.thumbPath, 'polygons' : polygonsJson}) 
 
     # Foreach class
-    for class_ in project.classes:
+    for class_ in prj.classes:
         projectJson['classes'].append({ 'id' : class_.id, 'color' : class_.color, 'name' : class_.name}) 
 
 
-    with open('masks/'+ project.name + '/project.json', 'w', encoding='utf-8') as f:
+    with open('masks/'+ prj.name + '/project.json', 'w', encoding='utf-8') as f:
         json.dump(projectJson, f, ensure_ascii=False, indent=4)
 
 def main():
-    loadProject()
+
+    # Load project
+    project = loadProject()
 
     # Create project dir
     if not os.path.isdir('masks/' + project.name):
         os.makedirs('masks/' + project.name + '/img')
 
     # Create masks
-    for img in project.images:
-        createMask(img)
+    createMask(project)
     
-    createProjectJson()
+    # Create project json
+    createProjectJson(project)
 
 if __name__ == "__main__":
     main()
