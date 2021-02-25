@@ -91,10 +91,10 @@ def createMask(img):
 
         draw.polygon(poly.points,fill = colorRGB,outline = colorRGB)
 
-    back.save('masks/'+ project.name +'/mask_'+ img.name + '.bmp', quality=100, subsampling=0)
+    back.save('masks/'+ project.name +'/img/mask_'+ img.name + '.bmp', quality=100, subsampling=0)
 
 def createProjectJson():
-    projectJson = {'images' : [] , 'classes' : [], 'projectDir' : project.projectDir, 'name' : project.name}
+    projectJson = {'projectDir' : project.projectDir, 'name' : project.name, 'images' : [] , 'classes' : []}
 
     # Foreach image
     for img in project.images:
@@ -118,15 +118,17 @@ def createProjectJson():
         projectJson['classes'].append({ 'id' : class_.id, 'color' : class_.color, 'name' : class_.name}) 
 
 
-    with open('data.json', 'w', encoding='utf-8') as f:
+    with open('masks/'+ project.name + '/project.json', 'w', encoding='utf-8') as f:
         json.dump(projectJson, f, ensure_ascii=False, indent=4)
 
 def main():
     loadProject()
 
-    if not os.path.isdir("masks/" + project.name):
-        os.makedirs("masks/" + project.name)
+    # Create project dir
+    if not os.path.isdir('masks/' + project.name):
+        os.makedirs('masks/' + project.name + '/img')
 
+    # Create masks
     for img in project.images:
         createMask(img)
     
