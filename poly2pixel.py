@@ -1,8 +1,7 @@
 ######################################################################
 ##            github.com/Jose-Verdu-Diaz/sa_poly2pixel              ##
 ######################################################################
-import os
-import json
+import os, sys, json
 import tkinter as tk
 from tkinter import filedialog
 from PIL import Image, ImageDraw
@@ -29,7 +28,7 @@ def loadProject():
     prj.name = name[len(name) - 1]
     
     # Debugging placeholder dir [Only for testing]
-    #project.projectDir = "/home/pepv/Practiques/Segm/Software/MRI"
+    #prj.projectDir = "/home/pepv/Practiques/Segm/Software/MRI"
 
     # Load images.sa
     with open(prj.projectDir + '/images/images.sa') as f:
@@ -78,6 +77,36 @@ def loadProject():
             i.polygons = polygons
 
     return prj             
+
+# Show file browser and load SuperAnnotate exported project (create project object)
+def loadExportedProject():
+
+    prj = Project()
+    '''
+    # Directory explorer
+    root = tk.Tk()
+    root.withdraw()
+
+    prj.projectDir = filedialog.askdirectory()
+
+    name = prj.projectDir.split('/')
+    prj.name = name[len(name) - 1]
+    '''
+    # Debugging placeholder dir [Only for testing]
+    prj.projectDir = "/home/pepv/Practiques/Segm/MRIs/Tracked/RM1"
+
+    maskFiles = sorted(os.listdir(prj.projectDir + '/annotations'))
+    imageFiles = sorted(os.listdir(prj.projectDir + '/img'))
+    classFile = prj.projectDir + 'classes.json'
+
+    _images = []
+
+    for f in imageFiles:
+        _images.append(Image_(None,f.strip('.jpg'),prj.projectDir + '/img/' + f, None))
+
+    prj.images = _images
+
+    sys.exit()
 
 # Create image masks from the project object
 def createMask(prj):
@@ -130,8 +159,16 @@ def createProjectJson(prj):
 
 def main():
 
+    option = input('(1) Import SA project\n(2) Import exported SA project\n')
+
     # Load project
-    project = loadProject()
+    if option == '1':
+        project = loadProject()
+    elif option == '2':
+        project = loadExportedProject()
+    else:
+        print('Unexpected option')
+        sys.exit()
 
     # Create project dir
     if not os.path.isdir('masks/' + project.name):
