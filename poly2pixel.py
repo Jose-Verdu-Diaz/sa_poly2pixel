@@ -15,10 +15,13 @@ from lib.createProjectJson import *
 from lib.loadExportedProject import *
 from lib.loadProject import *
 from lib.loadPoly2PixProject import *
+from lib.analyseProject import *
 
 def main():
 
     project = None
+
+    menuOptions = {0 : 'Analyse project', 1 : 'Create Masks', 2 : 'Export poly2pix project'}
 
     while True:
 
@@ -26,23 +29,30 @@ def main():
         printHeader()
         printLoadedProject(project)
 
-        print("\nChoose service you want to use : ")
         print("""
-        ━━━━━━━━━━━━ IMPORT ━━━━━━━━━━━━
-        1 : Import SA project 
-        2 : Import exported SA projects
-        3 : Import poly2pix project
+        \nChoose service you want to use :
 
-        ━━━━━━━━━━━━━ MASK ━━━━━━━━━━━━━
-        4 : Create Masks
-
-        ━━━━━━━━━━━━ EXPORT ━━━━━━━━━━━━
-        5 : Export poly2pix project
-
+        ┏━━━━━━━━━━━━━ IMPORT ━━━━━━━━━━━━┓
+        ┃ 1 : Import SA project           ┃
+        ┃ 2 : Import exported SA projects ┃
+        ┃ 3 : Import poly2pix project     ┃
+        ┃                                 ┃
+        ┣━━━━━━━━━━━━ ANALYSE ━━━━━━━━━━━━┫
+        ┃ 4 : {0}             ┃
+        ┃                                 ┃
+        ┣━━━━━━━━━━━━━ MASK ━━━━━━━━━━━━━━┫
+        ┃ 5 : {1}                ┃
+        ┃                                 ┃
+        ┣━━━━━━━━━━━━━ EXPORT ━━━━━━━━━━━━┫
+        ┃ 6 : {2}     ┃
+        ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
         
-        0 : Exit""")
+        0 : Exit""".format(*('\u0336'.join(menuOptions[opt]) + '\u0336' if project is None else menuOptions[opt] for opt in menuOptions)))
 
-        choice = input("\nEnter your choice : ")
+        try:
+            choice = input("\nEnter your choice : ")
+        except:
+            choice = ''
 
         # Load project
         if choice == '0':
@@ -61,14 +71,32 @@ def main():
             project = loadPoly2PixProject()
 
         elif choice == '4':
-            createMask(project)
+            if project is None:
+                input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
+                pass
+
+            else:
+                analyseProject(project)
 
         elif choice == '5':
+            if project is None:
+                input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
+                pass
+
+            try:
+                createMask(project)
+            except:
+                input(f'\n{bcolors.FAIL}Error creating masks, press a key to continue...{bcolors.ENDC}')
+
+        elif choice == '6':
+            if project is None:
+                input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
+                pass
+
             createProjectJson(project)
 
         else:
-
-            input('Unexpected option, press a key to continue')
+            input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')
 
 if __name__ == "__main__":
     main()
