@@ -3,22 +3,26 @@ from tkinter import filedialog
 import os, sys, json
 from PIL import Image, ImageDraw
 
+from lib.aux import *
 from lib.models.project import Project
 from lib.models.class_ import Class_
 from lib.models.polygon import Polygon
 from lib.models.image_ import Image_
 
-def loadPoly2PixProject():
+def loadPoly2PixProject(debug):
     prj = Project()
     
-    # Directory explorer
-    root = tk.Tk()
-    root.withdraw()
-
-    project = filedialog.askopenfilename()
+    if debug:
+        project= "/home/pepv/Practiques/Segm/Software/sa_poly2pixel/masks/RM1/project.json"    
+    else:
+        # Directory explorer
+        root = tk.Tk()
+        root.withdraw()
+        project = filedialog.askopenfilename()
     
-    # Debugging placeholder dir [Only for testing]
-    #project= "/home/pepv/Practiques/Segm/Software/sa_poly2pixel/masks/RM1/project.json"
+    if not isinstance(project, str) or project == '': 
+        input(f'\n{bcolors.FAIL}No project selected, press a key to continue...{bcolors.ENDC}')
+        return
 
     with open(project) as f:
 

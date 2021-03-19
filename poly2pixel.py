@@ -1,8 +1,12 @@
 ######################################################################
 ##            github.com/Jose-Verdu-Diaz/sa_poly2pixel              ##
 ######################################################################
+from lib.showSequence import showSequence
 import os, sys, json
 from PIL import Image, ImageDraw
+
+
+import numpy as np
 
 from lib.models.project import Project
 from lib.models.class_ import Class_
@@ -16,6 +20,7 @@ from lib.loadExportedProject import *
 from lib.loadProject import *
 from lib.loadPoly2PixProject import *
 from lib.analyseProject import *
+from lib.showSequence import *
 
 def main():
 
@@ -46,7 +51,7 @@ def main():
         ┣━━━━━━━━━━━━━ EXPORT ━━━━━━━━━━━━┫
         ┃ 6 : {2}     ┃
         ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
+        7 : test
         0 : Exit""".format(*('\u0336'.join(menuOptions[opt]) + '\u0336' if project is None else menuOptions[opt] for opt in menuOptions)))
 
         try:
@@ -68,7 +73,7 @@ def main():
 
         elif choice == '3':
             project = None
-            project = loadPoly2PixProject()
+            project = loadPoly2PixProject(False)
 
         elif choice == '4':
             if project is None:
@@ -79,7 +84,7 @@ def main():
                 analyseProject(project)
 
         elif choice == '5':
-            if project is None:
+            if project == None:
                 input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
                 pass
 
@@ -89,10 +94,12 @@ def main():
                 input(f'\n{bcolors.FAIL}Error creating masks, press a key to continue...{bcolors.ENDC}')
 
         elif choice == '6':
-            if project is None:
+            if project == None:
                 input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
                 pass
+
             createProjectJson(project)
+            input(f'\n{bcolors.OKGREEN}Project exported, press a key to continue...{bcolors.ENDC}')
 
         else:
             input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')

@@ -1,27 +1,29 @@
 import os
 from lib.aux import *
-from lib.analyseProject_functions.analyseProject_Classes import *
-from lib.analyseProject_functions.analyseProject_Images import *
 
-def analyseProject(prj):
+from lib.showSequence import *
+
+def ap_images(prj):
     while True:
         os.system("clear")
         printHeader()
         printLoadedProject(prj)
 
-        print(f'''
-                {bcolors.BOLD}Name:{bcolors.ENDC} {prj.name}
-            {bcolors.BOLD}Directory:{bcolors.ENDC} {prj.projectDir}
-        {bcolors.BOLD}Nº of images:{bcolors.ENDC} {len(prj.images)}
-        {bcolors.BOLD}Nº of classes:{bcolors.ENDC} {len(prj.classes)}
-        ''')
+        idList = []
+        nameList = []
+        nPolyList = []
+
+        for i,img in enumerate(prj.images):
+            idList.append(str(i))
+            nameList.append(str(img.name))
+            nPolyList.append(str(len(img.polygons)))
+        printTable(['Id','Name','Nº of poly'],[idList,nameList,nPolyList])
 
         print("""
             \nChoose an option:
 
             ┏━━━━━━━━━━━━━━━━━━━━━━━┓
-            ┃ 1 : Classes           ┃
-            ┃ 2 : Images            ┃
+            ┃ 1 : Show images       ┃
             ┃                       ┃
             ┗━━━━━━━━━━━━━━━━━━━━━━━┛
             
@@ -37,7 +39,4 @@ def analyseProject(prj):
             return
 
         elif choice == '1':
-            ap_classes(prj)
-
-        elif choice == '2':
-            ap_images(prj)
+            showSequence(f'{prj.projectDir}/img/', 0, 50)

@@ -3,6 +3,7 @@ from tkinter import filedialog
 import os, sys, json
 from PIL import Image, ImageDraw
 
+from lib.aux import *
 from lib.models.project import Project
 from lib.models.class_ import Class_
 from lib.models.polygon import Polygon
@@ -18,6 +19,10 @@ def loadProject():
     root.withdraw()
 
     prj.projectDir = filedialog.askdirectory()
+
+    if not isinstance(prj.projectDir, str) or prj.projectDir == '': 
+        input(f'\n{bcolors.FAIL}No project selected, press a key to continue...{bcolors.ENDC}')
+        return
 
     name = prj.projectDir.split('/')
     prj.name = name[len(name) - 1]
