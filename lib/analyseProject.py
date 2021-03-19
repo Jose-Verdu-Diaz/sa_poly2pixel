@@ -17,7 +17,11 @@ def analyseProject(prj):
         print("""
             \nChoose an option:
 
-            1 : Print classes 
+            ┏━━━━━━━━━━━━━━━━━━━━━━━┓
+            ┃ 1 : Show classes      ┃
+            ┃ 2 : Show images       ┃
+            ┃                       ┃
+            ┗━━━━━━━━━━━━━━━━━━━━━━━┛
             
             0 : Exit""")
 
@@ -31,12 +35,29 @@ def analyseProject(prj):
             return
 
         elif choice == '1':
-            for cls in prj.classes:
-                # Get hex color and strip '#'
-                colorHex = cls.color.lstrip('#')
-                # Convert hex color to rgb
-                colorRGB = tuple(int(colorHex[i:i+2], 16) for i in (0, 2, 4))
+            idList = []
+            nameList = []
+            colorList = []
 
-                print(f'{get_color_escape(colorRGB[0],colorRGB[1],colorRGB[2], True)}{cls.id}{bcolors.ENDC} : {get_color_escape(colorRGB[0],colorRGB[1],colorRGB[2])}{cls.name}{bcolors.ENDC}')
-        
+            for cls in prj.classes:
+                idList.append(str(cls.id))
+                nameList.append(str(cls.name))
+                colorHex = cls.color.lstrip('#')
+                colorRGB = tuple(int(colorHex[i:i+2], 16) for i in (0, 2, 4))
+                colorList.append(get_color_escape(colorRGB[0],colorRGB[1],colorRGB[2], True))
+
+            printTable(['Id','Name','Color'],[idList,nameList,''],colorList)
+
+        elif choice == '2':
+            idList = []
+            nameList = []
+            nPolyList = []
+
+            for i,img in enumerate(prj.images):
+                idList.append(str(i))
+                nameList.append(str(img.name))
+                nPolyList.append(str(len(img.polygons)))
+            printTable(['Id','Name','Nº of poly'],[idList,nameList,nPolyList])
+
+
         input('\nPress a key to continue...')

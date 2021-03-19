@@ -46,7 +46,7 @@ def main():
         ┣━━━━━━━━━━━━━ EXPORT ━━━━━━━━━━━━┫
         ┃ 6 : {2}     ┃
         ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-        
+
         0 : Exit""".format(*('\u0336'.join(menuOptions[opt]) + '\u0336' if project is None else menuOptions[opt] for opt in menuOptions)))
 
         try:
@@ -55,7 +55,7 @@ def main():
             choice = ''
 
         # Load project
-        if choice == '0':
+        if choice is '0':
             exit()
 
         elif choice == '1':
@@ -92,7 +92,6 @@ def main():
             if project is None:
                 input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
                 pass
-
             createProjectJson(project)
 
         else:

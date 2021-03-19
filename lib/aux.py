@@ -62,3 +62,66 @@ def printHeader():
 
 def printLoadedProject(prj):
     print(bcolors.BOLD + bcolors.OKBLUE + 'Loaded project: {project}'.format(project= bcolors.FAIL + 'None' if prj == None else bcolors.OKGREEN + prj.name) + bcolors.ENDC )
+
+def printTable(headers, data, colors = None):
+    #######################################
+    # Calc the longest row of each column #
+    #######################################
+    columnsMax = [*(0 for i in headers)]
+    for i,col in enumerate(data):
+        for row in col:
+            if len(str(row)) + 2 > columnsMax[i]: columnsMax[i] = len(str(row)) + 2
+    #If header is the longest
+    for i,h in enumerate(headers):
+        if len(str(h)) + 2 > columnsMax[i]: columnsMax[i] = len(str(h)) + 2
+
+    separatorList = ['┳','┃ ', '╋']
+    edgeListL = ['┏','┃ ','┣']
+    edgeListR = ['┓','┃','┫']
+
+    #################
+    # Print Headers #
+    #################
+    for i in range(3):
+
+        line = []
+        for j,h in enumerate(headers):
+            if j == len(headers) - 1:
+                separator = ''
+            else:
+                separator = separatorList[i]
+            
+            if i == 1:
+                line.append(h + "".join([*(" " for k in range(columnsMax[j] - len(h) - 1))]) + separator)
+            else:
+                line.append("".join([*("━" for k in range(columnsMax[j]))]) + separator)
+
+        print(f'{edgeListL[i]}{"".join([*(line)])}{edgeListR[i]}')
+
+    colLen = len(data)
+    rowLen = len(data[0])
+
+    for i in range(rowLen):
+        line=[]
+        for j in range(colLen):
+            if not colors == None and j == len(headers) - 2:
+                separator = '┃'
+            elif j == len(headers) - 1:
+                separator = ''
+            else:
+                separator = '┃ '
+
+            if not colors == None and j == len(headers) - 1:
+                line.append(colors[i] + "".join([*(" " for k in range(columnsMax[j]))]) + bcolors.ENDC + separator)
+            else:   
+                line.append(data[j][i] + "".join([*(" " for k in range(columnsMax[j] - len(data[j][i]) - 1))]) + separator)
+        print(f'{edgeListL[1]}{"".join([*(line)])}{edgeListR[1]}')
+    
+    line = []
+    for i,h in enumerate(headers):
+        if i == len(headers) - 1:
+            separator = ''
+        else:
+            separator = '┻'      
+        line.append("".join([*("━" for k in range(columnsMax[i]))]) + separator)
+    print(f'┗{"".join([*(line)])}┛')
