@@ -51,7 +51,9 @@ def main():
         ┣━━━━━━━━━━━━━ EXPORT ━━━━━━━━━━━━┫
         ┃ 6 : {2}     ┃
         ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-        7 : test
+
+        7 : DEBUG
+
         0 : Exit""".format(*('\u0336'.join(menuOptions[opt]) + '\u0336' if project is None else menuOptions[opt] for opt in menuOptions)))
 
         try:
@@ -60,7 +62,7 @@ def main():
             choice = ''
 
         # Load project
-        if choice is '0':
+        if choice == '0':
             exit()
 
         elif choice == '1':
@@ -76,7 +78,7 @@ def main():
             project = loadPoly2PixProject(False)
 
         elif choice == '4':
-            if project is None:
+            if project == None:
                 input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
                 pass
 
@@ -100,6 +102,10 @@ def main():
 
             createProjectJson(project)
             input(f'\n{bcolors.OKGREEN}Project exported, press a key to continue...{bcolors.ENDC}')
+
+        elif choice == '7':
+            project = None
+            project = loadPoly2PixProject(True)
 
         else:
             input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')

@@ -39,4 +39,4 @@ def ap_images(prj):
             return
 
         elif choice == '1':
-            showSequence(f'{prj.projectDir}/img/', 0, 50)
+            showSequence(f'{prj.projectDir}/img/', None, 50)

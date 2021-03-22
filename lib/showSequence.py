@@ -9,7 +9,7 @@ def showSequence(dir, maskId, interval):
         ims.append(cv2.imread(f'{dir}/{file}'))
 
     if not maskId == None:
-        for img in ims:
+        for i,img in enumerate(ims):
             black_pixels_mask = np.all(img != [maskId, maskId, maskId], axis=-1)
             non_black_pixels_mask = ~black_pixels_mask
 
