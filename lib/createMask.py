@@ -1,5 +1,6 @@
-import os, sys, json
+import os, cv2
 from PIL import Image, ImageDraw
+import numpy as np
 
 from lib.aux import *
 from lib.models.project import Project
@@ -16,9 +17,9 @@ def createMask(prj):
         printLoadedProject(prj)
 
         print(f'''
-                {bcolors.BOLD}Name:{bcolors.ENDC} {prj.name}
+                 {bcolors.BOLD}Name:{bcolors.ENDC} {prj.name}
             {bcolors.BOLD}Directory:{bcolors.ENDC} {prj.projectDir}
-        {bcolors.BOLD}Nº of images:{bcolors.ENDC} {len(prj.images)}
+         {bcolors.BOLD}Nº of images:{bcolors.ENDC} {len(prj.images)}
         {bcolors.BOLD}Nº of classes:{bcolors.ENDC} {len(prj.classes)}
         ''')
 
@@ -28,7 +29,7 @@ def createMask(prj):
             ┏━━━━━━━━━━━━━━━━━━━━━━━┓
             ┃ 1 : Black and white   ┃
             ┃ 2 : Default colors    ┃
-            ┃                       ┃
+            ┃ 3 : Individual masks  ┃
             ┗━━━━━━━━━━━━━━━━━━━━━━━┛
             
             0 : Exit""")
@@ -81,6 +82,40 @@ def createMask(prj):
 
                     draw.polygon(poly.points,fill = colorRGB,outline = colorRGB)
 
-                back.save('masks/'+ prj.name +'/img/mask_'+ img.name + '.bmp', quality=100, subsampling=0)
+                back.save(f'masks/{prj.name}/img/mask_{img.name}.bmp', quality=100, subsampling=0)
 
             input(f'\n{bcolors.OKGREEN}Color masks created, press a key to continue...{bcolors.ENDC}')
+        
+        elif choice == '3':
+            ims = []
+            files=[]
+            for file in sorted(os.listdir(f'masks/{prj.name}/img')):
+                ims.append(cv2.imread(f'masks/{prj.name}/img/{file}'))
+                files.append(os.path.splitext(file)[0])
+
+            printProgressBar(0, len(prj.classes)*len(ims), prefix = 'Extracting individual masks:', suffix = 'Complete', length = 50)
+
+            if not os.path.exists(f'masks/{prj.name}/individual'):
+                os.makedirs(f'masks/{prj.name}/individual')
+
+            for i,cls in enumerate(prj.classes):
+                if not os.path.exists(f'masks/{prj.name}/individual/{str(cls.id).zfill(4)}'):
+                    os.makedirs(f'masks/{prj.name}/individual/{str(cls.id).zfill(4)}')
+
+                ims_copy = []
+                for img in ims:
+                    ims_copy.append(img.copy())
+
+                for j,img in enumerate(ims_copy):
+                    black_pixels_mask = np.all(img != [cls.id, cls.id, cls.id], axis=-1)
+                    non_black_pixels_mask = ~black_pixels_mask
+
+                    img[black_pixels_mask] = [0, 0, 0]
+                    img[non_black_pixels_mask] = [255, 255, 255]
+
+                    cv2.imwrite(f'masks/{prj.name}/individual/{str(cls.id).zfill(4)}/{files[j]}_{str(cls.id).zfill(4)}.bmp', img)
+                
+                    printProgressBar(i*len(ims) + j, len(prj.classes)*len(ims), prefix = 'Extracting individual masks:', suffix = f'({i*len(ims) + j}/{len(prj.classes)*len(ims)})', length = 50)
+
+        else:
+            input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')

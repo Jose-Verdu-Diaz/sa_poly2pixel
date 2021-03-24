@@ -32,39 +32,25 @@ def ap_checkErrors(prj):
             return
 
         elif choice == '1':
-            '''
-            img = cv2.imread('test19.bmp',cv2.IMREAD_GRAYSCALE)
-            contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-            input(len(contours))
-            '''
-            dir = '/home/pepv/Practiques/Segm/Software/sa_poly2pixel/masks/RM1/img'
-            ims = []
-            for file in sorted(os.listdir(dir)):
-                ims.append(cv2.imread(f'{dir}/{file}'))
+            if not os.path.exists(f'masks/{prj.name}/logs'):
+                os.makedirs(f'masks/{prj.name}/logs')
 
-            printProgressBar(0, len(prj.classes)*len(ims), prefix = 'Extracting individual masks:', suffix = 'Complete', length = 50)
+            with open(f'masks/{prj.name}/logs/repeated_class.txt', 'w') as log:
+                for cls in sorted(os.listdir(f'masks/{prj.name}/individual')):
 
-            if not os.path.exists(f'masks/{prj.name}/individual'):
-                os.makedirs(f'masks/{prj.name}/individual')
+                    log.write(f'### {prj.classes[int(cls)-1].name} ({cls}) ###\n')
 
-            for i,cls in enumerate(prj.classes):
-                if not os.path.exists(f'masks/{prj.name}/individual/{cls.id}_{cls.name}'):
-                    os.makedirs(f'masks/{prj.name}/individual/{cls.id}_{cls.name}')
+                    for file in sorted(os.listdir(f'masks/{prj.name}/individual/{cls}')):
+                        img = cv2.imread(f'masks/{prj.name}/individual/{cls}/{file}',cv2.IMREAD_GRAYSCALE)
+                        contours, hierarchy = cv2.findContours(img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 
-                ims_copy = []
-                for img in ims:
-                    ims_copy.append(img.copy())
+                        if len(contours) > 1:
+                            print(f'{bcolors.FAIL}{cls} ## {file} ## {len(contours)}{bcolors.ENDC}')
+                            log.write(f'\t{file}\n')
 
-                for j,img in enumerate(ims_copy):
-                    black_pixels_mask = np.all(img != [cls.id, cls.id, cls.id], axis=-1)
-                    non_black_pixels_mask = ~black_pixels_mask
+                    log.write('\n')
 
-                    img[black_pixels_mask] = [0, 0, 0]
-                    img[non_black_pixels_mask] = [255, 255, 255]
-
-                    cv2.imwrite(f'masks/{prj.name}/individual/{cls.id}_{cls.name}/{j}.bmp', img)
-                
-                    printProgressBar(i*len(ims) + j, len(prj.classes)*len(ims), prefix = 'Extracting individual masks:', suffix = f'({i*len(ims) + j}/{len(prj.classes)*len(ims)})', length = 50)
+            input('Continue')
 
         else:
             input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')
