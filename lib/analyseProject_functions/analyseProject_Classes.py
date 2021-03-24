@@ -47,3 +47,6 @@ def ap_classes(prj):
             classId = int(input('\nSelect a class Id: '))
 
             showSequence("/home/pepv/Practiques/Segm/Software/sa_poly2pixel/masks/RM1/img", classId, 50)
+
+        else:
+            input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')

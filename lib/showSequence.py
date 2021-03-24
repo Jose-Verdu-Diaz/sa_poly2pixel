@@ -3,14 +3,14 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import cv2, os 
 
-def showSequence(dir, maskId, interval):
+def showSequence(dir, classId, interval):
     ims = []
     for file in sorted(os.listdir(dir)):
         ims.append(cv2.imread(f'{dir}/{file}'))
 
-    if not maskId == None:
+    if not classId == None:
         for i,img in enumerate(ims):
-            black_pixels_mask = np.all(img != [maskId, maskId, maskId], axis=-1)
+            black_pixels_mask = np.all(img != [classId, classId, classId], axis=-1)
             non_black_pixels_mask = ~black_pixels_mask
 
             img[black_pixels_mask] = [0, 0, 0]

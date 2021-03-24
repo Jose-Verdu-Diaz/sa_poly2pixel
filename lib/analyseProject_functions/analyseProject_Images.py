@@ -40,3 +40,6 @@ def ap_images(prj):
 
         elif choice == '1':
             showSequence(f'{prj.projectDir}/img/', None, 50)
+
+        else:
+            input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')
