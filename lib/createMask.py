@@ -40,7 +40,7 @@ def createMask(prj):
             choice = ''
 
         # Create project dir
-        if not os.path.isdir('masks/' + prj.name):
+        if not os.path.isdir('masks/' + prj.name + '/img'):
             os.makedirs('masks/' + prj.name + '/img')
 
         if choice == '0':
@@ -62,7 +62,7 @@ def createMask(prj):
                 for poly in img.polygons:
                     draw.polygon(poly.points,fill = int(poly.classId),outline = int(poly.classId))
 
-                back.save('masks/'+ prj.name +'/img/mask_'+ img.name + '.bmp', quality=100, subsampling=0)
+                back.save('masks/'+ prj.name +'/img/'+ img.name + '.bmp', quality=100, subsampling=0)
 
             input(f'\n{bcolors.OKGREEN}Black and White masks created, press a key to continue...{bcolors.ENDC}')
 
@@ -82,7 +82,7 @@ def createMask(prj):
 
                     draw.polygon(poly.points,fill = colorRGB,outline = colorRGB)
 
-                back.save(f'masks/{prj.name}/img/mask_{img.name}.bmp', quality=100, subsampling=0)
+                back.save(f'masks/{prj.name}/img/{img.name}.bmp', quality=100, subsampling=0)
 
             input(f'\n{bcolors.OKGREEN}Color masks created, press a key to continue...{bcolors.ENDC}')
         

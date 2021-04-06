@@ -58,7 +58,7 @@ def loadExportedProject():
 
                 polygons.append(Polygon(poly['classId'], points))
             
-            _images.append(Image_(None,f.strip('.json'),prj.projectDir + '/img/' + f.strip('.json') + '.jpg', None, polygons))               
+            _images.append(Image_(None,f.strip('.json').strip('.jpg'),prj.projectDir + '/img/' + f.strip('.json'), None, polygons))               
     prj.images = _images
 
     # Load classes.json

@@ -8,6 +8,10 @@ from lib.models.image_ import Image_
 
 # Create a json file from projec object
 def createProjectJson(prj):
+
+    if not os.path.exists(f'masks/{prj.name}'):
+        os.makedirs(f'masks/{prj.name}')
+
     projectJson = {'projectDir' : prj.projectDir, 'name' : prj.name, 'images' : [] , 'classes' : []}
 
     # Foreach image

@@ -3,6 +3,7 @@ from lib.aux import *
 from lib.showSequence import *
 
 def ap_classes(prj):
+
     while True:
         os.system("clear")
         printHeader()
@@ -41,12 +42,12 @@ def ap_classes(prj):
             return
 
         elif choice == '1':
-            showSequence("/home/pepv/Practiques/Segm/Software/sa_poly2pixel/masks/RM1/img", None, 50)
+            showSequence(f'{os.getcwd()}/masks/{prj.name}/img', None, 50)
 
         elif choice == '2': 
             classId = int(input('\nSelect a class Id: '))
 
-            showSequence("/home/pepv/Practiques/Segm/Software/sa_poly2pixel/masks/RM1/img", classId, 50)
+            showSequence(f'{os.getcwd()}/masks/{prj.name}/img', classId, 50)
 
         else:
             input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')

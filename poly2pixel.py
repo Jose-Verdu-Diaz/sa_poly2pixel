@@ -89,10 +89,10 @@ def main():
             if project == None:
                 input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
                 pass
-
             try:
                 createMask(project)
-            except:
+            except Exception as e:
+                print(str(e))
                 input(f'\n{bcolors.FAIL}Error creating masks, press a key to continue...{bcolors.ENDC}')
 
         elif choice == '6':
