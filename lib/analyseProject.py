@@ -3,6 +3,7 @@ from lib.aux import *
 from lib.analyseProject_functions.analyseProject_Classes import *
 from lib.analyseProject_functions.analyseProject_Images import *
 from lib.analyseProject_functions.analyseProject_CheckErrors import *
+from lib.analyseProject_functions.analyseProject_EditProject import *
 
 def analyseProject(prj):
     while True:
@@ -24,6 +25,7 @@ def analyseProject(prj):
             ┃ 1 : Classes           ┃
             ┃ 2 : Images            ┃
             ┃ 3 : Check errors      ┃
+            ┃ 4 : Edit project      ┃
             ┗━━━━━━━━━━━━━━━━━━━━━━━┛
             
             0 : Exit""")
@@ -45,6 +47,9 @@ def analyseProject(prj):
 
         elif choice == '3':
             ap_checkErrors(prj)
+
+        elif choice == '4':
+            ap_editProject(prj)      
 
         else:
             input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')

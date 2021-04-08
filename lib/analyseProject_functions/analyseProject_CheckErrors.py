@@ -107,7 +107,7 @@ def ap_checkErrors(prj):
                         elif cache == 2 and len(contours) > 0:
                             print(f'\r{bcolors.FAIL}{cls} ## {files[i-1]} ## {len(contours)}{bcolors.ENDC}{"".join([*(" " for k in range(68))])}')
                             ## 68 is the part of the length of the progress bar, this is for "cleaning" the line. This is a dirty, hard-typed solution that should be improved.
-                            log.write(f'\t{files[i-1]}\n')
+                            log.write(f'\t{files[j-1]}\n')
                             cache = 1
 
                         printProgressBar(i*len(files) + j, len(dirs)*len(files), prefix = 'Analysing individual masks:', suffix = 'Complete', length = 50)
