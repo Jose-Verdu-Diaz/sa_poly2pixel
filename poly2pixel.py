@@ -22,12 +22,20 @@ from lib.loadPoly2PixProject import *
 from lib.analyseProject import *
 from lib.showSequence import *
 from lib.augmentateData import *
+from lib.importImages import *
+from lib.importAnnotations import *
 
 def main():
 
     project = None
 
-    menuOptions = {0 : 'Analyse project', 1 : 'Create Masks', 2 : 'Export poly2pix project', 3 : 'Augmentate data'}
+    menuOptions = {
+    0 : 'Import images',
+    1 : 'Import annotations',
+    2 : 'Analyse project',
+    3 : 'Create Masks',
+    4 : 'Export poly2pix project',
+    5 : 'Augmentate data'}
 
     while True:
 
@@ -42,22 +50,24 @@ def main():
         ┃ 1 : Import SA project           ┃
         ┃ 2 : Import exported SA projects ┃
         ┃ 3 : Import poly2pix project     ┃
+        ┃ 4 : {0}               ┃
+        ┃ 5 : {1}          ┃
         ┃                                 ┃
         ┣━━━━━━━━━━━━ ANALYSE ━━━━━━━━━━━━┫
-        ┃ 4 : {0}             ┃
+        ┃ 6 : {2}             ┃
         ┃                                 ┃
         ┣━━━━━━━━━━━━━ MASK ━━━━━━━━━━━━━━┫
-        ┃ 5 : {1}                ┃
+        ┃ 7 : {3}                ┃
         ┃                                 ┃
         ┣━━━━━━━━━━━━━ EXPORT ━━━━━━━━━━━━┫
-        ┃ 6 : {2}     ┃
+        ┃ 8 : {4}     ┃
         ┃                                 ┃
-        ┣━━━━━━━━━━━━━ EXPORT ━━━━━━━━━━━━┫
-        ┃ 7 : {3}             ┃
+        ┣━━━━━━━━━━━ AUGMENTATE━━━━━━━━━━━┫
+        ┃ 9 : {5}             ┃
         ┃                                 ┃
         ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-        8 : DEBUG
+        10 : DEBUG
 
         0 : Exit""".format(*('\u0336'.join(menuOptions[opt]) + '\u0336' if project is None else menuOptions[opt] for opt in menuOptions)))
 
@@ -88,9 +98,27 @@ def main():
                 pass
 
             else:
-                analyseProject(project)
+                importImages(project)
+                input(f'\n{bcolors.OKGREEN}Images imported, press a key to continue...{bcolors.ENDC}')
 
         elif choice == '5':
+            if project == None:
+                input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
+                pass
+
+            else:
+                importAnnotations(project)
+                input(f'\n{bcolors.OKGREEN}Annotations imported, press a key to continue...{bcolors.ENDC}')
+
+        elif choice == '6':
+            if project == None:
+                input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
+                pass
+
+            else:
+                analyseProject(project)
+
+        elif choice == '7':
             if project == None:
                 input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
                 pass
@@ -100,23 +128,23 @@ def main():
                 print(str(e))
                 input(f'\n{bcolors.FAIL}Error creating masks, press a key to continue...{bcolors.ENDC}')
 
-        elif choice == '6':
-            if project == None:
-                input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
-                pass
-
-            createProjectJson(project)
-            input(f'\n{bcolors.OKGREEN}Project exported, press a key to continue...{bcolors.ENDC}')
-
-        elif choice == '7':
-            if project == None:
-                input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
-                pass
-
-            augmentateData(project)
-
-
         elif choice == '8':
+            if project == None:
+                input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
+                pass
+
+            else:
+                createProjectJson(project)
+                input(f'\n{bcolors.OKGREEN}Project exported, press a key to continue...{bcolors.ENDC}')
+
+        elif choice == '9':
+            if project == None:
+                input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
+                pass
+            else: augmentateData(project)
+
+
+        elif choice == '10':
             project = None
             project = loadPoly2PixProject(True)
 
