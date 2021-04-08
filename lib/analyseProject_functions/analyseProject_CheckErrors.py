@@ -33,23 +33,23 @@ def ap_checkErrors(prj):
             return
 
         elif choice == '1':
-            if not os.path.exists(f'masks/{prj.name}/logs/repeated_img'):
-                os.makedirs(f'masks/{prj.name}/logs/repeated_img')
+            if not os.path.exists(f'projects/{prj.name}/logs/repeated_img'):
+                os.makedirs(f'projects/{prj.name}/logs/repeated_img')
 
-            with open(f'masks/{prj.name}/logs/repeated_class.txt', 'w') as log:
-                for cls in sorted(os.listdir(f'masks/{prj.name}/individual')):
+            with open(f'projects/{prj.name}/logs/repeated_class.txt', 'w') as log:
+                for cls in sorted(os.listdir(f'projects/{prj.name}/individual')):
 
                     log.write(f'### {prj.classes[int(cls)-1].name} ({cls}) ###\n')
 
-                    for file in sorted(os.listdir(f'masks/{prj.name}/individual/{cls}')):
-                        img = cv2.imread(f'masks/{prj.name}/individual/{cls}/{file}',cv2.IMREAD_GRAYSCALE)
+                    for file in sorted(os.listdir(f'projects/{prj.name}/individual/{cls}')):
+                        img = cv2.imread(f'projects/{prj.name}/individual/{cls}/{file}',cv2.IMREAD_GRAYSCALE)
                         contours, hierarchy = cv2.findContours(img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 
                         if len(contours) > 1:
                             print(f'{bcolors.FAIL}{cls} ## {file} ## {len(contours)}{bcolors.ENDC}')
                             log.write(f'\t{file}\n')
 
-                            im = cv2.imread(f'masks/{prj.name}/img/{file.split("_")[0]}.bmp')
+                            im = cv2.imread(f'projects/{prj.name}/masks/{file.split("_")[0]}.bmp')
                             f= os.path.splitext(f'{file.split("_")[0]}.bmp')[0]
 
                             im_copy = im.copy()
@@ -61,7 +61,7 @@ def ap_checkErrors(prj):
                                 img[black_pixels_mask] = [0, 0, 0]
                                 img[non_black_pixels_mask] = [199, 65, 72]
 
-                                cv2.imwrite(f'masks/{prj.name}/logs/repeated_img/{file}', img)
+                                cv2.imwrite(f'projects/{prj.name}/logs/repeated_img/{file}', img)
 
                     log.write('\n')
 
@@ -69,13 +69,13 @@ def ap_checkErrors(prj):
 
         elif choice == '2':
 
-            if not os.path.exists(f'masks/{prj.name}/logs/missing_img'):
-                os.makedirs(f'masks/{prj.name}/logs/missing_img')
+            if not os.path.exists(f'projects/{prj.name}/logs/missing_img'):
+                os.makedirs(f'projects/{prj.name}/logs/missing_img')
 
-            with open(f'masks/{prj.name}/logs/missing_class.txt', 'w') as log:
-                dirs = sorted(os.listdir(f'masks/{prj.name}/individual'))
+            with open(f'projects/{prj.name}/logs/missing_class.txt', 'w') as log:
+                dirs = sorted(os.listdir(f'projects/{prj.name}/individual'))
 
-                files_aux= sorted(os.listdir(f'masks/{prj.name}/individual/{dirs[0]}'))
+                files_aux= sorted(os.listdir(f'projects/{prj.name}/individual/{dirs[0]}'))
                 printProgressBar(0, len(dirs)*len(files_aux), prefix = 'Analysing individual masks:', suffix = 'Complete', length = 50)
 
                 for i,cls in enumerate(dirs):                   
@@ -86,10 +86,10 @@ def ap_checkErrors(prj):
 
                     log.write(f'### {prj.classes[int(cls)-1].name} ({cls}) ###\n')
 
-                    files= sorted(os.listdir(f'masks/{prj.name}/individual/{cls}'))
+                    files= sorted(os.listdir(f'projects/{prj.name}/individual/{cls}'))
                     for j,file in enumerate(files):
 
-                        img = cv2.imread(f'masks/{prj.name}/individual/{cls}/{file}',cv2.IMREAD_GRAYSCALE)
+                        img = cv2.imread(f'projects/{prj.name}/individual/{cls}/{file}',cv2.IMREAD_GRAYSCALE)
                         contours, hierarchy = cv2.findContours(img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 
                         if j==0: cache = 0

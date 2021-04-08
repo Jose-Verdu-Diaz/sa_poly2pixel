@@ -42,12 +42,12 @@ def ap_classes(prj):
             return
 
         elif choice == '1':
-            showSequence(f'{os.getcwd()}/masks/{prj.name}/img', None, 50)
+            showSequence(f'{os.getcwd()}/projects/{prj.name}/masks', None, 50)
 
         elif choice == '2': 
             classId = int(input('\nSelect a class Id: '))
 
-            showSequence(f'{os.getcwd()}/masks/{prj.name}/img', classId, 50)
+            showSequence(f'{os.getcwd()}/projects/{prj.name}/masks', classId, 50)
 
         else:
             input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')

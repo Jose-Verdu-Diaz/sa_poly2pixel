@@ -40,8 +40,8 @@ def createMask(prj):
             choice = ''
 
         # Create project dir
-        if not os.path.isdir('masks/' + prj.name + '/img'):
-            os.makedirs('masks/' + prj.name + '/img')
+        if not os.path.isdir('projects/' + prj.name + '/masks'):
+            os.makedirs('projects/' + prj.name + '/masks')
 
         if choice == '0':
             return   
@@ -62,7 +62,7 @@ def createMask(prj):
                 for poly in img.polygons:
                     draw.polygon(poly.points,fill = int(poly.classId),outline = int(poly.classId))
 
-                back.save('masks/'+ prj.name +'/img/'+ img.name + '.bmp', quality=100, subsampling=0)
+                back.save('projects/'+ prj.name +'/masks/'+ img.name + '.bmp', quality=100, subsampling=0)
 
             input(f'\n{bcolors.OKGREEN}Black and White masks created, press a key to continue...{bcolors.ENDC}')
 
@@ -82,25 +82,25 @@ def createMask(prj):
 
                     draw.polygon(poly.points,fill = colorRGB,outline = colorRGB)
 
-                back.save(f'masks/{prj.name}/img/{img.name}.bmp', quality=100, subsampling=0)
+                back.save(f'projects/{prj.name}/masks/{img.name}.bmp', quality=100, subsampling=0)
 
             input(f'\n{bcolors.OKGREEN}Color masks created, press a key to continue...{bcolors.ENDC}')
         
         elif choice == '3':
             ims = []
             files=[]
-            for file in sorted(os.listdir(f'masks/{prj.name}/img')):
-                ims.append(cv2.imread(f'masks/{prj.name}/img/{file}'))
+            for file in sorted(os.listdir(f'projects/{prj.name}/masks')):
+                ims.append(cv2.imread(f'projects/{prj.name}/masks/{file}'))
                 files.append(os.path.splitext(file)[0])
 
             printProgressBar(0, len(prj.classes)*len(ims), prefix = 'Extracting individual masks:', suffix = 'Complete', length = 50)
 
-            if not os.path.exists(f'masks/{prj.name}/individual'):
-                os.makedirs(f'masks/{prj.name}/individual')
+            if not os.path.exists(f'projects/{prj.name}/individual'):
+                os.makedirs(f'projects/{prj.name}/individual')
 
             for i,cls in enumerate(prj.classes):
-                if not os.path.exists(f'masks/{prj.name}/individual/{str(cls.id).zfill(4)}'):
-                    os.makedirs(f'masks/{prj.name}/individual/{str(cls.id).zfill(4)}')
+                if not os.path.exists(f'projects/{prj.name}/individual/{str(cls.id).zfill(4)}'):
+                    os.makedirs(f'projects/{prj.name}/individual/{str(cls.id).zfill(4)}')
 
                 ims_copy = []
                 for img in ims:
@@ -113,7 +113,7 @@ def createMask(prj):
                     img[black_pixels_mask] = [0, 0, 0]
                     img[non_black_pixels_mask] = [255, 255, 255]
 
-                    cv2.imwrite(f'masks/{prj.name}/individual/{str(cls.id).zfill(4)}/{files[j]}_{str(cls.id).zfill(4)}.bmp', img)
+                    cv2.imwrite(f'projects/{prj.name}/individual/{str(cls.id).zfill(4)}/{files[j]}_{str(cls.id).zfill(4)}.bmp', img)
                 
                     printProgressBar(i*len(ims) + j, len(prj.classes)*len(ims), prefix = 'Extracting individual masks:', suffix = f'({i*len(ims) + j}/{len(prj.classes)*len(ims)})', length = 50)
 

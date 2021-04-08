@@ -21,12 +21,13 @@ from lib.loadProject import *
 from lib.loadPoly2PixProject import *
 from lib.analyseProject import *
 from lib.showSequence import *
+from lib.augmentateData import *
 
 def main():
 
     project = None
 
-    menuOptions = {0 : 'Analyse project', 1 : 'Create Masks', 2 : 'Export poly2pix project'}
+    menuOptions = {0 : 'Analyse project', 1 : 'Create Masks', 2 : 'Export poly2pix project', 3 : 'Augmentate data'}
 
     while True:
 
@@ -50,9 +51,13 @@ def main():
         ┃                                 ┃
         ┣━━━━━━━━━━━━━ EXPORT ━━━━━━━━━━━━┫
         ┃ 6 : {2}     ┃
+        ┃                                 ┃
+        ┣━━━━━━━━━━━━━ EXPORT ━━━━━━━━━━━━┫
+        ┃ 7 : {3}             ┃
+        ┃                                 ┃
         ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-        7 : DEBUG
+        8 : DEBUG
 
         0 : Exit""".format(*('\u0336'.join(menuOptions[opt]) + '\u0336' if project is None else menuOptions[opt] for opt in menuOptions)))
 
@@ -104,6 +109,14 @@ def main():
             input(f'\n{bcolors.OKGREEN}Project exported, press a key to continue...{bcolors.ENDC}')
 
         elif choice == '7':
+            if project == None:
+                input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
+                pass
+
+            augmentateData(project)
+
+
+        elif choice == '8':
             project = None
             project = loadPoly2PixProject(True)
 

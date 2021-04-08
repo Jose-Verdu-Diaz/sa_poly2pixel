@@ -9,8 +9,8 @@ from lib.models.image_ import Image_
 # Create a json file from projec object
 def createProjectJson(prj):
 
-    if not os.path.exists(f'masks/{prj.name}'):
-        os.makedirs(f'masks/{prj.name}')
+    if not os.path.exists(f'projects/{prj.name}'):
+        os.makedirs(f'projects/{prj.name}')
 
     projectJson = {'projectDir' : prj.projectDir, 'name' : prj.name, 'images' : [] , 'classes' : []}
 
@@ -36,5 +36,5 @@ def createProjectJson(prj):
         projectJson['classes'].append({ 'id' : class_.id, 'color' : class_.color, 'name' : class_.name}) 
 
 
-    with open('masks/'+ prj.name + '/project.json', 'w', encoding='utf-8') as f:
+    with open('projects/'+ prj.name + '/project.json', 'w', encoding='utf-8') as f:
         json.dump(projectJson, f, ensure_ascii=False, indent=4)
