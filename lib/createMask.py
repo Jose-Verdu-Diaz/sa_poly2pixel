@@ -47,6 +47,8 @@ def createMask(prj):
             return   
 
         elif choice == '1':
+            if not os.path.exists(f'projects/{prj.name}/masks'):
+                os.makedirs(f'projects/{prj.name}/masks')
 
             # Only 255 supported classes. Check project.
             if len(prj.classes) >= 255:
@@ -54,7 +56,6 @@ def createMask(prj):
                 return
 
             for img in prj.images:
-
                 image = Image.open(img.imagePath)
                 back = Image.new('L', (image.size[0],image.size[1]))
                 draw = ImageDraw.Draw(back)
@@ -62,11 +63,14 @@ def createMask(prj):
                 for poly in img.polygons:
                     draw.polygon(poly.points,fill = int(poly.classId),outline = int(poly.classId))
 
-                back.save('projects/'+ prj.name +'/masks/'+ img.name + '.bmp', quality=100, subsampling=0)
+                back.save(f'projects/{prj.name}/masks/{img.name}.bmp', quality=100, subsampling=0)
 
             input(f'\n{bcolors.OKGREEN}Black and White masks created, press a key to continue...{bcolors.ENDC}')
 
         elif choice == '2':
+            if not os.path.exists(f'projects/{prj.name}/masks_color'):
+                os.makedirs(f'projects/{prj.name}/masks_color')
+
             for img in prj.images:
 
                 image = Image.open(img.imagePath)
@@ -82,7 +86,7 @@ def createMask(prj):
 
                     draw.polygon(poly.points,fill = colorRGB,outline = colorRGB)
 
-                back.save(f'projects/{prj.name}/masks/{img.name}.bmp', quality=100, subsampling=0)
+                back.save(f'projects/{prj.name}/masks_color/{img.name}.bmp', quality=100, subsampling=0)
 
             input(f'\n{bcolors.OKGREEN}Color masks created, press a key to continue...{bcolors.ENDC}')
         
