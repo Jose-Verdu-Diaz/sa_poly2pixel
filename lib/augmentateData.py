@@ -2,6 +2,9 @@ import os, cv2, itertools, multiprocessing
 import imgaug as ia
 import imgaug.augmenters as iaa
 from functools import partial
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 from lib.aux import *
 from lib.analyseProject_functions.analyseProject_Classes import *
@@ -27,7 +30,7 @@ def augment_seg(img,seg,seq):
 
     return image_aug , segmap_aug
 
-def aug_process(j,prmt,i,prjName,images,masks):
+def aug_process(j,prmt,i,prjName,images,masks,counter,sum):
     if not os.path.exists(f'projects/{prjName}/augmented/{i}/{j}/img'):
         os.makedirs(f'projects/{prjName}/augmented/{i}/{j}/img')
     if not os.path.exists(f'projects/{prjName}/augmented/{i}/{j}/masks'):
@@ -43,6 +46,9 @@ def aug_process(j,prmt,i,prjName,images,masks):
         )
         cv2.imwrite(f'projects/{prjName}/augmented/{i}/{j}/img/{img}', image_aug)
         cv2.imwrite(f'projects/{prjName}/augmented/{i}/{j}/masks/{masks[k]}', segmap_aug)
+
+        with counter.get_lock(): counter.value += 1
+        printProgressBar(counter.value, sum*len(images), prefix = 'Augmenting:', suffix = f'({counter.value}/{sum*len(images)}) Complete', length = 50)
 
 def augmentateData(prj):
     prjName = prj.name
@@ -60,7 +66,8 @@ def augmentateData(prj):
             \nChoose an option:
 
             ┏━━━━━━━━━━━━━━━━━━━━━━━┓
-            ┃ 1 : TEST              ┃
+            ┃ 1 : Augmentate        ┃
+            ┃ 2 : TEST              ┃            
             ┗━━━━━━━━━━━━━━━━━━━━━━━┛
             
             0 : Exit""")
@@ -85,53 +92,61 @@ def augmentateData(prj):
                 if i<1 or i>1: continue
                 p = list(itertools.permutations(elements,i+1))
                 all_permutations.append(p)
-            
+
             sum = 0
             for e in all_permutations:
                 sum += len(list(e))
 
-            print(sum)
+            # Create a global variable.
+            counter = multiprocessing.Value("i", 0, lock=True)
 
-            count = 0
-            printProgressBar(0, sum * len(images), prefix = 'Augmenting:', suffix = f'({count}/{sum*len(images)}) Complete', length = 50)
+            printProgressBar(0, sum * len(images), prefix = 'Augmenting:', suffix = f'({counter.value}/{sum*len(images)}) Complete', length = 50)
 
             for i,prmt_list in enumerate(all_permutations):
                 if not os.path.exists(f'projects/{prjName}/augmented/{i}'):
                     os.makedirs(f'projects/{prjName}/augmented/{i}')
 
-                prod_x=partial(aug_process, i=i, prjName=prjName,images=images,masks=masks)
+                '''
+                aug_process_i=partial(aug_process, i=i, prjName=prjName,images=images,masks=masks)
 
                 pool = multiprocessing.Pool()
-                pool.starmap(prod_x,enumerate(prmt_list))
+                pool.starmap(aug_process_i,enumerate(prmt_list))
                 # Close pool.
                 pool.close()
 
                 # Wait for all thread.
                 pool.join()
-
                 '''
+
+                processes =  []
                 for j,prmt in enumerate(prmt_list):
-                    if not os.path.exists(f'projects/{prjName}/augmented/{i}/{j}/img'):
-                        os.makedirs(f'projects/{prjName}/augmented/{i}/{j}/img')
-                    if not os.path.exists(f'projects/{prjName}/augmented/{i}/{j}/masks'):
-                        os.makedirs(f'projects/{prjName}/augmented/{i}/{j}/masks')
+                    p = multiprocessing.Process(target=aug_process, args=(j,prmt,i,prjName,images,masks,counter,sum))
+                    processes.append(p)
+                    p.start()
 
-                    seq = iaa.Sequential(prmt)
+                for p in processes:
+                    p.join()
 
-                    for k,img in enumerate(images):
-                        image_aug,segmap_aug = augment_seg(
-                            cv2.imread(f'projects/{prjName}/img/{img}'),
-                            cv2.imread(f'projects/{prjName}/masks/{masks[k]}'),
-                            seq
-                        )
-                        cv2.imwrite(f'projects/{prjName}/augmented/{i}/{j}/img/{img}', image_aug)
-                        cv2.imwrite(f'projects/{prjName}/augmented/{i}/{j}/masks/{masks[k]}', segmap_aug)
-
-                        count += 1                 
-                        printProgressBar( count, sum * len(images), prefix = 'Augmenting:', suffix = f'({count}/{sum*len(images)}) Complete', length = 50)
-                '''
-                input(f'\Wait...')
             input(f'\nContinue...')
+
+        elif choice == '2':
+            ims = []
+            for file in sorted(os.listdir(f'projects/{prjName}/augmented/0')):
+                print(file)
+                ims.append(cv2.imread(f'projects/{prjName}/augmented/0/{file}/img/0001-0054.jpg'))
+
+            fig = plt.figure()
+            sequence = []
+            for img in ims:
+                im = plt.imshow(img, animated=True)
+                im.axes.xaxis.set_visible(False)
+                im.axes.yaxis.set_visible(False)
+                sequence.append([im])
+
+            ani = animation.ArtistAnimation(fig, sequence, interval=50, blit=True, repeat_delay=0)
+            plt.show()
+
+            input('Continue...')           
 
         else:
             input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')
