@@ -67,8 +67,6 @@ def main():
         ┃                                 ┃
         ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-        10 : DEBUG
-
         0 : Exit""".format(*('\u0336'.join(menuOptions[opt]) + '\u0336' if project is None else menuOptions[opt] for opt in menuOptions)))
 
         try:
@@ -142,11 +140,6 @@ def main():
                 input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
                 pass
             else: augmentateData(project)
-
-
-        elif choice == '10':
-            project = None
-            project = loadPoly2PixProject(True)
 
         else:
             input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')

@@ -13,7 +13,7 @@ def loadPoly2PixProject(debug):
     prj = Project()
     
     if debug:
-        project= "/home/pepv/Practiques/Segm/Software/sa_poly2pixel/projects/RM1/project.json"    
+        pass    
     else:
         # Directory explorer
         root = tk.Tk()

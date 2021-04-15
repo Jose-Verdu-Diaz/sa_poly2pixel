@@ -67,8 +67,7 @@ def augmentateData(prj):
             \nChoose an option:
 
             ┏━━━━━━━━━━━━━━━━━━━━━━━┓
-            ┃ 1 : Augmentate        ┃
-            ┃ 2 : TEST (In dev)     ┃            
+            ┃ 1 : Augmentate        ┃          
             ┗━━━━━━━━━━━━━━━━━━━━━━━┛
             
             0 : Exit""")
@@ -118,39 +117,7 @@ def augmentateData(prj):
                 for p in processes:
                     p.join()
 
-            input(f'\nContinue...')
-
-        elif choice == '2':
-
-            #############
-            ##  IN DEV ##
-            #############
-            input(f'\n{bcolors.FAIL}This feature is in development. Continue...{bcolors.ENDC}')
-            return
-            #############
-
-            ims = []
-            for prmt_list in sorted(os.listdir(f'projects/{prjName}/augmented')):
-                for prmt in sorted(os.listdir(f'projects/{prjName}/augmented/{prmt_list}')):
-                    if os.path.exists(f'projects/{prjName}/augmented/{prmt_list}/{prmt}/img/0001-0050.jpg'):
-                        ims.append(cv2.imread(f'projects/{prjName}/augmented/{prmt_list}/{prmt}/img/0001-0050.jpg'))
-
-            fig = plt.figure()
-            sequence = []
-            for img in random.sample(ims, len(ims)):
-                im = plt.imshow(img, animated=True)
-                im.axes.xaxis.set_visible(False)
-                im.axes.yaxis.set_visible(False)
-                sequence.append([im])
-
-            ani = animation.ArtistAnimation(fig, sequence, interval=50, blit=True, repeat_delay=0)
-            plt.show()
-
-            Writer = animation.writers['ffmpeg']
-            writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
-            ani.save('im.mp4', writer=writer)
-
-            input('Continue...')           
+            input(f'\nContinue...')        
 
         else:
             input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')
