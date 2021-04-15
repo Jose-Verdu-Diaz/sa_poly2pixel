@@ -1,4 +1,4 @@
-![Logo](https://github.com/Jose-Verdu-Diaz/sa_poly2pixel/blob/main/lib/img/01.png)
+![Logo](https://github.com/Jose-Verdu-Diaz/sa_poly2pixel/lib/img/01.png)
 
 # sa_poly2pixel
 Python tool for processing SuperAnnotate's Desktop projects, creating mask images from the annotations.json and other utils.
