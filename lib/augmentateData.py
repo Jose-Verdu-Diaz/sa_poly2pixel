@@ -30,7 +30,7 @@ def augment_seg(img,seg,seq):
 
     return image_aug , segmap_aug
 
-def aug_process(j,prmt,i,prjName,images,masks,counter,sum):
+def aug_process(j,prmt,i,prjName,images,masks,counter,permutations):
     if not os.path.exists(f'projects/{prjName}/augmented/{i}/{j}/img'):
         os.makedirs(f'projects/{prjName}/augmented/{i}/{j}/img')
     if not os.path.exists(f'projects/{prjName}/augmented/{i}/{j}/masks'):
@@ -48,7 +48,7 @@ def aug_process(j,prmt,i,prjName,images,masks,counter,sum):
         cv2.imwrite(f'projects/{prjName}/augmented/{i}/{j}/masks/{masks[k]}_{i}-{j}-{k}', segmap_aug)
 
         with counter.get_lock(): counter.value += 1
-        printProgressBar(counter.value, sum*len(images), prefix = 'Augmenting:', suffix = f'({counter.value}/{sum*len(images)}) Complete', length = 50)
+        printProgressBar(counter.value, permutations*len(images), prefix = 'Augmenting:', suffix = f'({counter.value}/{permutations*len(images)}) Complete', length = 50)
 
 
 def augmentateData(prj):
@@ -66,15 +66,26 @@ def augmentateData(prj):
 
     #Stores which augmenters will be used
     parameters = [True for aug in augmenters]
-
-
     
     while True:
+        all_permutations = []
+        chose_augmenters = [aug for i,aug in enumerate(augmenters) if parameters[i]]
+
+        for i,e in enumerate(chose_augmenters):
+            #if i<1: continue
+            p = list(itertools.permutations(chose_augmenters,i+1))
+            all_permutations.append(p)
+
+        permutations = 0
+        for e in all_permutations:
+            permutations += len(list(e))
+
         os.system("clear")
         printHeader()
         printLoadedProject(prj)
 
         print(f'{bcolors.BOLD}Nº of images:{bcolors.ENDC} {len(prj.images)}')
+        print(f'{bcolors.BOLD}Permutations:{bcolors.ENDC} {permutations}')
 
         print("""
             \n
@@ -109,22 +120,10 @@ def augmentateData(prj):
             if not os.path.exists(f'projects/{prjName}/augmented'):
                 os.makedirs(f'projects/{prjName}/augmented')
 
-            all_permutations = []
-            chose_augmenters = [aug for i,aug in enumerate(augmenters) if parameters[i]]
-            for i,e in enumerate(chose_augmenters):
-                if i<1: continue
-                p = list(itertools.permutations(chose_augmenters,i+1))
-                all_permutations.append(p)
-
-            sum = 0
-            for e in all_permutations:
-                sum += len(list(e))
-            print(sum)
-
             # Create a global variable.
             counter = multiprocessing.Value("i", 0, lock=True)
 
-            printProgressBar(0, sum * len(images), prefix = 'Augmenting:', suffix = f'({counter.value}/{sum*len(images)}) Complete', length = 50)
+            printProgressBar(0, permutations * len(images), prefix = 'Augmenting:', suffix = f'({counter.value}/{permutations*len(images)}) Complete', length = 50)
 
             for i,prmt_list in enumerate(all_permutations):
                 if not os.path.exists(f'projects/{prjName}/augmented/{i}'):
@@ -133,7 +132,7 @@ def augmentateData(prj):
                 
                 processes =  []
                 for j,prmt in enumerate(prmt_list):
-                    p = multiprocessing.Process(target=aug_process, args=(j,prmt,i,prjName,images,masks,counter,sum))
+                    p = multiprocessing.Process(target=aug_process, args=(j,prmt,i,prjName,images,masks,counter,permutations))
                     processes.append(p)
                     p.start()
 
