@@ -27,9 +27,9 @@ def showSequence(dir, classId, interval):
 
     ani = animation.ArtistAnimation(fig, sequence, interval=interval, blit=True, repeat_delay=0)
 
-    Writer = animation.writers['ffmpeg']
-    writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
-    ani.save('im.mp4', writer=writer)
+    #Writer = animation.writers['ffmpeg']
+    #writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
+    #ani.save('im.mp4', writer=writer)
 
     # To save the animation, use e.g.
     #

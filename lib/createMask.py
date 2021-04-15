@@ -47,6 +47,10 @@ def createMask(prj):
             return   
 
         elif choice == '1':
+            if not os.path.exists(f'projects/{prj.name}/img'):
+                input(f'\n{bcolors.FAIL}Import images first. Continue...{bcolors.ENDC}')
+                return
+
             if not os.path.exists(f'projects/{prj.name}/masks'):
                 os.makedirs(f'projects/{prj.name}/masks')
 
@@ -56,7 +60,7 @@ def createMask(prj):
                 return
 
             for img in prj.images:
-                image = Image.open(img.imagePath)
+                image = Image.open(f'projects/{prj.name}/img/{img.name}.jpg')
                 back = Image.new('L', (image.size[0],image.size[1]))
                 draw = ImageDraw.Draw(back)
 
@@ -68,12 +72,16 @@ def createMask(prj):
             input(f'\n{bcolors.OKGREEN}Black and White masks created, press a key to continue...{bcolors.ENDC}')
 
         elif choice == '2':
+            if not os.path.exists(f'projects/{prj.name}/img'):
+                input(f'\n{bcolors.FAIL}Import images first. Continue...{bcolors.ENDC}')
+                return
+
             if not os.path.exists(f'projects/{prj.name}/masks_color'):
                 os.makedirs(f'projects/{prj.name}/masks_color')
 
             for img in prj.images:
 
-                image = Image.open(img.imagePath)
+                image = Image.open(f'projects/{prj.name}/img/{img.name}.jpg')
                 back = Image.new('RGB', (image.size[0],image.size[1]), (0, 0, 0))
                 draw = ImageDraw.Draw(back)
 
@@ -91,6 +99,10 @@ def createMask(prj):
             input(f'\n{bcolors.OKGREEN}Color masks created, press a key to continue...{bcolors.ENDC}')
         
         elif choice == '3':
+            if not os.path.exists(f'projects/{prj.name}/masks'):
+                input(f'\n{bcolors.FAIL}Create B&W masks first. Continue...{bcolors.ENDC}')
+                return
+
             ims = []
             files=[]
             for file in sorted(os.listdir(f'projects/{prj.name}/masks')):
