@@ -44,17 +44,30 @@ def aug_process(j,prmt,i,prjName,images,masks,counter,sum):
             cv2.imread(f'projects/{prjName}/masks/{masks[k]}'),
             seq
         )
-        cv2.imwrite(f'projects/{prjName}/augmented/{i}/{j}/img/{img}', image_aug)
-        cv2.imwrite(f'projects/{prjName}/augmented/{i}/{j}/masks/{masks[k]}', segmap_aug)
+        cv2.imwrite(f'projects/{prjName}/augmented/{i}/{j}/img/{img}_{i}-{j}-{k}', image_aug)
+        cv2.imwrite(f'projects/{prjName}/augmented/{i}/{j}/masks/{masks[k]}_{i}-{j}-{k}', segmap_aug)
 
         with counter.get_lock(): counter.value += 1
         printProgressBar(counter.value, sum*len(images), prefix = 'Augmenting:', suffix = f'({counter.value}/{sum*len(images)}) Complete', length = 50)
 
 
 def augmentateData(prj):
+
+    # Stores tick and cross symbols for the menu 
+    tick = dict([(True, f'{bcolors.OKGREEN}{bcolors.BOLD}✔{bcolors.ENDC}'), (False, f'{bcolors.FAIL}{bcolors.BOLD}✘{bcolors.ENDC}')])
+
+    #Global vars
     prjName = prj.name
     images = sorted(os.listdir(f'projects/{prjName}/img'))
     masks = sorted(os.listdir(f'projects/{prjName}/masks'))
+
+    #Stores the augmenters
+    augmenters = [aug1,aug2,aug3,aug4,aug5,aug6,aug7,aug8]
+
+    #Stores which augmenters will be used
+    parameters = [True for aug in augmenters]
+
+
     
     while True:
         os.system("clear")
@@ -64,14 +77,20 @@ def augmentateData(prj):
         print(f'{bcolors.BOLD}Nº of images:{bcolors.ENDC} {len(prj.images)}')
 
         print("""
-            \nChoose an option:
+            \n
+            Toggle options
+            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            {0} 1 : Elastic Transformation    
+            {1} 2 : Flip vertical axis      
+            {2} 3 : Gaussian Blur           
+            {3} 4 : Average Pooling         
+            {4} 5 : Perspective ransform    
+            {5} 6 : Piecewise Affine    
+            {6} 7 : Enhance Sharpness      
+            {7} 8 : Gamma Contrast          
 
-            ┏━━━━━━━━━━━━━━━━━━━━━━━┓
-            ┃ 1 : Augmentate        ┃
-            ┃ 2 : TEST (In dev)     ┃            
-            ┗━━━━━━━━━━━━━━━━━━━━━━━┛
-            
-            0 : Exit""")
+            9 : Augmentate     
+            0 : Exit""".format(*(''.join(tick[opt]) for opt in parameters)))
 
         try:
             choice = input("\nEnter your choice : ")
@@ -82,16 +101,19 @@ def augmentateData(prj):
         if choice == '0':
             return
 
-        elif choice == '1':
+        elif 1 <= int(choice) <= 8:
+            parameters[int(choice)-1] = not parameters[int(choice)-1]
+
+        elif choice == '9':
 
             if not os.path.exists(f'projects/{prjName}/augmented'):
                 os.makedirs(f'projects/{prjName}/augmented')
 
-            elements = [aug1,aug2,aug4,aug5,aug6,aug7,aug8]
             all_permutations = []
-            for i,e in enumerate(elements):
+            chose_augmenters = [aug for i,aug in enumerate(augmenters) if parameters[i]]
+            for i,e in enumerate(chose_augmenters):
                 if i<1: continue
-                p = list(itertools.permutations(elements,i+1))
+                p = list(itertools.permutations(chose_augmenters,i+1))
                 all_permutations.append(p)
 
             sum = 0
@@ -118,39 +140,7 @@ def augmentateData(prj):
                 for p in processes:
                     p.join()
 
-            input(f'\nContinue...')
-
-        elif choice == '2':
-
-            #############
-            ##  IN DEV ##
-            #############
-            input(f'\n{bcolors.FAIL}This feature is in development. Continue...{bcolors.ENDC}')
-            return
-            #############
-
-            ims = []
-            for prmt_list in sorted(os.listdir(f'projects/{prjName}/augmented')):
-                for prmt in sorted(os.listdir(f'projects/{prjName}/augmented/{prmt_list}')):
-                    if os.path.exists(f'projects/{prjName}/augmented/{prmt_list}/{prmt}/img/0001-0050.jpg'):
-                        ims.append(cv2.imread(f'projects/{prjName}/augmented/{prmt_list}/{prmt}/img/0001-0050.jpg'))
-
-            fig = plt.figure()
-            sequence = []
-            for img in random.sample(ims, len(ims)):
-                im = plt.imshow(img, animated=True)
-                im.axes.xaxis.set_visible(False)
-                im.axes.yaxis.set_visible(False)
-                sequence.append([im])
-
-            ani = animation.ArtistAnimation(fig, sequence, interval=50, blit=True, repeat_delay=0)
-            plt.show()
-
-            Writer = animation.writers['ffmpeg']
-            writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
-            ani.save('im.mp4', writer=writer)
-
-            input('Continue...')           
+            input(f'\nContinue...')      
 
         else:
             input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')
