@@ -1,4 +1,4 @@
-import os, cv2, itertools, multiprocessing, random
+import os, cv2, itertools, multiprocessing, random, shutil
 import imgaug as ia
 import imgaug.augmenters as iaa
 from functools import partial
@@ -30,11 +30,16 @@ def augment_seg(img,seg,seq):
 
     return image_aug , segmap_aug
 
-def aug_process(j,prmt,i,prjName,images,masks,counter,sum):
-    if not os.path.exists(f'projects/{prjName}/augmented/{i}/{j}/img'):
-        os.makedirs(f'projects/{prjName}/augmented/{i}/{j}/img')
-    if not os.path.exists(f'projects/{prjName}/augmented/{i}/{j}/masks'):
-        os.makedirs(f'projects/{prjName}/augmented/{i}/{j}/masks')
+def aug_process(j,prmt,i,prjName,images,masks,counter,permutations,aug_key):
+    name = ''
+    for aug in prmt:
+        name += str(aug_key[aug.__class__.__name__])
+
+    if not os.path.exists(f'projects/{prjName}/augmented/{i+1}_prmt/{name}/img'):
+        os.makedirs(f'projects/{prjName}/augmented/{i+1}_prmt/{name}/img')
+
+    if not os.path.exists(f'projects/{prjName}/augmented/{i+1}_prmt/{name}/masks'):
+        os.makedirs(f'projects/{prjName}/augmented/{i+1}_prmt/{name}/masks')
 
     seq = iaa.Sequential(prmt)
 
@@ -44,73 +49,100 @@ def aug_process(j,prmt,i,prjName,images,masks,counter,sum):
             cv2.imread(f'projects/{prjName}/masks/{masks[k]}'),
             seq
         )
-        cv2.imwrite(f'projects/{prjName}/augmented/{i}/{j}/img/{img}', image_aug)
-        cv2.imwrite(f'projects/{prjName}/augmented/{i}/{j}/masks/{masks[k]}', segmap_aug)
+        cv2.imwrite(f'projects/{prjName}/augmented/{i+1}_prmt/{name}/img/{img.strip(".jpg")}-{i+1}_prmt-{name}-{k}.bmp', image_aug)
+        cv2.imwrite(f'projects/{prjName}/augmented/{i+1}_prmt/{name}/masks/{masks[k].strip(".jpg")}-{i+1}_prmt-{name}-{k}.bmp', segmap_aug)
 
         with counter.get_lock(): counter.value += 1
-        printProgressBar(counter.value, sum*len(images), prefix = 'Augmenting:', suffix = f'({counter.value}/{sum*len(images)}) Complete', length = 50)
+        printProgressBar(counter.value, permutations*len(images), prefix = 'Augmenting:', suffix = f'({counter.value}/{permutations*len(images)}) Complete', length = 50)
 
 
 def augmentateData(prj):
+
+    # Stores tick and cross symbols for the menu 
+    tick = dict([(True, f'{bcolors.OKGREEN}{bcolors.BOLD}✔{bcolors.ENDC}'), (False, f'{bcolors.FAIL}{bcolors.BOLD}✘{bcolors.ENDC}')])
+
+    #Global vars
     prjName = prj.name
     images = sorted(os.listdir(f'projects/{prjName}/img'))
     masks = sorted(os.listdir(f'projects/{prjName}/masks'))
+
+    #Stores the augmenters
+    augmenters = [aug1,aug2,aug3,aug4,aug5,aug6,aug7,aug8]
+
+    #Stores which augmenters will be used
+    parameters = [True for aug in augmenters]
     
     while True:
+        all_permutations = []
+        chosen_augmenters = [aug for i,aug in enumerate(augmenters) if parameters[i]]
+
+        for i,e in enumerate(chosen_augmenters):
+            #if i<1: continue
+            p = list(itertools.permutations(chosen_augmenters,i+1))
+            all_permutations.append(p)
+
+        permutations = 0
+        for e in all_permutations:
+            permutations += len(list(e))
+
         os.system("clear")
         printHeader()
         printLoadedProject(prj)
 
         print(f'{bcolors.BOLD}Nº of images:{bcolors.ENDC} {len(prj.images)}')
+        print(f'{bcolors.BOLD}Permutations:{bcolors.ENDC} {permutations}')
 
         print("""
-            \nChoose an option:
+            \n
+            Toggle options
+            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            {0} 1 : Elastic Transformation    
+            {1} 2 : Flip vertical axis      
+            {2} 3 : Gaussian Blur           
+            {3} 4 : Average Pooling         
+            {4} 5 : Perspective ransform    
+            {5} 6 : Piecewise Affine (Slow)
+            {6} 7 : Enhance Sharpness      
+            {7} 8 : Gamma Contrast          
 
-            ┏━━━━━━━━━━━━━━━━━━━━━━━┓
-            ┃ 1 : Augmentate        ┃          
-            ┗━━━━━━━━━━━━━━━━━━━━━━━┛
-            
-            0 : Exit""")
+            9 : Augmentate     
+            0 : Exit""".format(*(''.join(tick[opt]) for opt in parameters)))
 
         try:
-            choice = input("\nEnter your choice : ")
+            choice = int(input("\nEnter your choice : "))
         except:
-            choice = ''
+            choice = -1
 
-        # Load project
-        if choice == '0':
+        if choice == -1:
+            input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')
+
+        elif choice == 0:
             return
 
-        elif choice == '1':
+        elif 1 <= int(choice) <= 8:
+            parameters[int(choice)-1] = not parameters[int(choice)-1]
 
-            if not os.path.exists(f'projects/{prjName}/augmented'):
-                os.makedirs(f'projects/{prjName}/augmented')
+        elif choice == 9:
 
-            elements = [aug1,aug2,aug4,aug5,aug6,aug7,aug8]
-            all_permutations = []
-            for i,e in enumerate(elements):
-                if i<1: continue
-                p = list(itertools.permutations(elements,i+1))
-                all_permutations.append(p)
+            if os.path.exists(f'projects/{prjName}/augmented'):
+                shutil.rmtree(f'projects/{prjName}/augmented')
+            os.makedirs(f'projects/{prjName}/augmented')
 
-            sum = 0
-            for e in all_permutations:
-                sum += len(list(e))
-            print(sum)
+            aug_key = {k.__class__.__name__: v for v, k in enumerate(chosen_augmenters)}
+
+            with open(f'projects/{prjName}/augmented/augmenters.txt', 'w') as aug_file:
+                for aug, i in aug_key.items():
+                    aug_file.write(f'({i}) : {aug}\n')
 
             # Create a global variable.
             counter = multiprocessing.Value("i", 0, lock=True)
 
-            printProgressBar(0, sum * len(images), prefix = 'Augmenting:', suffix = f'({counter.value}/{sum*len(images)}) Complete', length = 50)
+            printProgressBar(0, permutations * len(images), prefix = 'Augmenting:', suffix = f'({counter.value}/{permutations*len(images)}) Complete', length = 50)
 
-            for i,prmt_list in enumerate(all_permutations):
-                if not os.path.exists(f'projects/{prjName}/augmented/{i}'):
-                    os.makedirs(f'projects/{prjName}/augmented/{i}')
-
-                
+            for i,prmt_list in enumerate(all_permutations):             
                 processes =  []
                 for j,prmt in enumerate(prmt_list):
-                    p = multiprocessing.Process(target=aug_process, args=(j,prmt,i,prjName,images,masks,counter,sum))
+                    p = multiprocessing.Process(target=aug_process, args=(j,prmt,i,prjName,images,masks,counter,permutations,aug_key))
                     processes.append(p)
                     p.start()
 
