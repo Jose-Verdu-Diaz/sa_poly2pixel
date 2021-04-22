@@ -3,6 +3,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - pip=20.3.3=py38h06a4308_0
   - _libgcc_mutex=0.1=main
   - _openmp_mutex=4.5=1_gnu
   - absl-py=0.11.0=pyhd3eb1b0_1
@@ -114,7 +115,6 @@ dependencies:
     - chardet=3.0.4=py38h06a4308_1003
     - libopenblas=0.3.7=h5ec1e0e_6
     - h5py=2.10.0=py38hd6299e0_1
-    - pip=20.3.3=py38h06a4308_0
     - c-ares=1.17.1=h27cfd23_0
     - intel-openmp=2020.2=254
     - gstreamer=1.14.5=h36ae1b5_2
