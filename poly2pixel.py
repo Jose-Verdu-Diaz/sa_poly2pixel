@@ -1,17 +1,7 @@
 ######################################################################
 ##            github.com/Jose-Verdu-Diaz/sa_poly2pixel              ##
 ######################################################################
-from lib.showSequence import showSequence
-import os, sys, json
-from PIL import Image, ImageDraw
-
-
-import numpy as np
-
-from lib.models.project import Project
-from lib.models.class_ import Class_
-from lib.models.polygon import Polygon
-from lib.models.image_ import Image_
+import os, yaml, argparse
 
 from lib.aux import *
 from lib.createMask import *
@@ -25,7 +15,11 @@ from lib.augmentateData import *
 from lib.importImages import *
 from lib.importAnnotations import *
 
-def main():
+def main(args):
+    config = yaml.load(open("config.yml"))
+    config['debug'] = args.debug
+    with open("config.yml",'w') as configFile:
+        yaml.dump(config, configFile)
 
     project = None
 
@@ -43,33 +37,43 @@ def main():
         printHeader()
         printLoadedProject(project)
 
-        print("""
-        \nChoose service you want to use :
+        if config['debug']: print(f'\n{bcolors.WARNING+bcolors.BOLD}\tDEBUG MODE{bcolors.ENDC}')
 
-        ┏━━━━━━━━━━━━━ IMPORT ━━━━━━━━━━━━┓
-        ┃ 1 : Import SA project           ┃
-        ┃ 2 : Import exported SA projects ┃
-        ┃ 3 : Import poly2pix project     ┃
-        ┃ 4 : {0}               ┃
-        ┃ 5 : {1}          ┃
-        ┃                                 ┃
-        ┣━━━━━━━━━━━━ ANALYSE ━━━━━━━━━━━━┫
-        ┃ 6 : {2}             ┃
-        ┃                                 ┃
-        ┣━━━━━━━━━━━━━ MASK ━━━━━━━━━━━━━━┫
-        ┃ 7 : {3}                ┃
-        ┃                                 ┃
-        ┣━━━━━━━━━━━━━ EXPORT ━━━━━━━━━━━━┫
-        ┃ 8 : {4}     ┃
-        ┃                                 ┃
-        ┣━━━━━━━━━━━ AUGMENTATE━━━━━━━━━━━┫
-        ┃ 9 : {5}             ┃
-        ┃                                 ┃
-        ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+        print(
+"""
+\nChoose service you want to use :
 
-        10 : DEBUG
+┏━━━━━━━━━━━━━ IMPORT ━━━━━━━━━━━━┓
+┃ 1 : Import SA project           ┃
+┃ 2 : Import exported SA projects ┃
+┃ 3 : Import poly2pix project     ┃
+┃ 4 : {0}               ┃
+┃ 5 : {1}          ┃
+┣━━━━━━━━━━━━ ANALYSE ━━━━━━━━━━━━┫
+┃ 6 : {2}             ┃
+┣━━━━━━━━━━━━━ MASK ━━━━━━━━━━━━━━┫
+┃ 7 : {3}                ┃
+┣━━━━━━━━━━━━━ EXPORT ━━━━━━━━━━━━┫
+┃ 8 : {4}     ┃
+┣━━━━━━━━━━━ AUGMENTATE━━━━━━━━━━━┫
+┃ 9 : {5}             ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+0 : Exit"""
+        .format(*('\u0336'.join(menuOptions[opt]) + '\u0336' if project is None else menuOptions[opt] for opt in menuOptions)))
 
-        0 : Exit""".format(*('\u0336'.join(menuOptions[opt]) + '\u0336' if project is None else menuOptions[opt] for opt in menuOptions)))
+        if config['debug']:
+            print(
+"""{warning}
+
+┏━━━━━━━━━━━━━ DEBUG ━━━━━━━━━━━━━┓
+┃ d1 : Load placeholder project   ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛{end}"""
+            .format(warning = bcolors.WARNING, end = bcolors.ENDC)
+            )
+        ### 
+        ### d1 : Loads the first project (if any) in the config['projectDir'] directoy. Does nothing if empty.
+        ###
+
 
         try:
             choice = input("\nEnter your choice : ")
@@ -144,12 +148,21 @@ def main():
             else: augmentateData(project)
 
 
-        elif choice == '10':
+        elif choice == 'd1':
             project = None
             project = loadPoly2PixProject(True)
 
         else:
             input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')
 
+
+def parseArguments():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d","--debug", help="Launch in debug mode", action="store_true")
+    return parser.parse_args()
+
+
+
 if __name__ == "__main__":
-    main()
+    args = parseArguments()
+    main(args)
