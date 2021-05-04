@@ -25,10 +25,11 @@ def ap_classes(prj):
         print("""
             \nChoose an option:
 
-            ┏━━━━━━━━━━━━━━━━━━━━━━━┓
-            ┃ 1 : Show segmentation ┃
-            ┃ 2 : Show class        ┃
-            ┗━━━━━━━━━━━━━━━━━━━━━━━┛
+            ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+            ┃ 1 : Show segmentation (B&W)   ┃
+            ┃ 2 : Show segmentation (Color) ┃
+            ┃ 3 : Show class                ┃
+            ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
             
             0 : Exit""")
 
@@ -43,8 +44,11 @@ def ap_classes(prj):
 
         elif choice == '1':
             showSequence(f'{os.getcwd()}/projects/{prj.name}/masks', None, 50)
+        
+        elif choice == '2':
+            showSequence(f'{os.getcwd()}/projects/{prj.name}/masks_color', None, 50)
 
-        elif choice == '2': 
+        elif choice == '3': 
             classId = int(input('\nSelect a class Id: '))
 
             showSequence(f'{os.getcwd()}/projects/{prj.name}/masks', classId, 50)

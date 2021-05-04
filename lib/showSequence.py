@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-import cv2, os 
+import cv2, os
+
 
 def showSequence(dir, classId, interval):
     ims = []
@@ -27,18 +28,14 @@ def showSequence(dir, classId, interval):
 
     ani = animation.ArtistAnimation(fig, sequence, interval=interval, blit=True, repeat_delay=0)
 
-    #Writer = animation.writers['ffmpeg']
-    #writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
-    #ani.save('im.mp4', writer=writer)
-
-    # To save the animation, use e.g.
-    #
-    # ani.save("movie.mp4")
-    #
-    # or
-    #
-    # from matplotlib.animation import FFMpegWriter
-    # writer = FFMpegWriter(fps=15, metadata=dict(artist='Me'), bitrate=1800)
-    # ani.save("movie.mp4", writer=writer)
-
+    
+    # Save video
+    '''
+    Writer = animation.writers['ffmpeg']
+    writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
+    ani.save('Masks.mp4', writer=writer)
+    '''
+    
     plt.show()
+
+
