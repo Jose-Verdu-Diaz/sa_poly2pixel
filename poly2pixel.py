@@ -14,6 +14,7 @@ from lib.showSequence import *
 from lib.augmentateData import *
 from lib.importImages import *
 from lib.importAnnotations import *
+from lib.configure import *
 
 def main(args):
     config = yaml.load(open("config.yml"))
@@ -39,34 +40,36 @@ def main(args):
 
         if config['debug']: print(f'\n{bcolors.WARNING+bcolors.BOLD}\tDEBUG MODE{bcolors.ENDC}')
 
+        print(f'\nProject dir: {config["projectDir"]}')
+
         print(
 """
 \nChoose service you want to use :
 
 ┏━━━━━━━━━━━━━ IMPORT ━━━━━━━━━━━━┓
-┃ 1 : Import SA project           ┃
-┃ 2 : Import exported SA projects ┃
-┃ 3 : Import poly2pix project     ┃
-┃ 4 : {0}               ┃
-┃ 5 : {1}          ┃
+┃  1: Import SA project           ┃
+┃  2: Import exported SA projects ┃
+┃  3: Import poly2pix project     ┃
+┃  4: {0}               ┃
+┃  5: {1}          ┃
 ┣━━━━━━━━━━━━ ANALYSE ━━━━━━━━━━━━┫
-┃ 6 : {2}             ┃
+┃  6: {2}             ┃
 ┣━━━━━━━━━━━━━ MASK ━━━━━━━━━━━━━━┫
-┃ 7 : {3}                ┃
+┃  7: {3}                ┃
 ┣━━━━━━━━━━━━━ EXPORT ━━━━━━━━━━━━┫
-┃ 8 : {4}     ┃
+┃  8: {4}     ┃
 ┣━━━━━━━━━━━ AUGMENTATE━━━━━━━━━━━┫
-┃ 9 : {5}             ┃
+┃  9: {5}             ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-0 : Exit"""
+  10: Configure
+   0: Exit"""
         .format(*('\u0336'.join(menuOptions[opt]) + '\u0336' if project is None else menuOptions[opt] for opt in menuOptions)))
 
         if config['debug']:
             print(
 """{warning}
-
 ┏━━━━━━━━━━━━━ DEBUG ━━━━━━━━━━━━━┓
-┃ d1 : Load placeholder project   ┃
+┃ d1: Load placeholder project   ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛{end}"""
             .format(warning = bcolors.WARNING, end = bcolors.ENDC)
             )
@@ -147,6 +150,8 @@ def main(args):
                 pass
             else: augmentateData(project)
 
+        elif choice == '10':
+            config = configure(project,config)
 
         elif choice == 'd1':
             project = None

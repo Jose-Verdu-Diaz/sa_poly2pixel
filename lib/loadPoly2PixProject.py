@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
-import os, sys, json
-from PIL import Image, ImageDraw
+import json
 
 from lib.aux import *
 from lib.models.project import Project
