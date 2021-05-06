@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
-import json
+import json, os
 
 from lib.aux import *
 from lib.models.project import Project
@@ -8,11 +8,11 @@ from lib.models.class_ import Class_
 from lib.models.polygon import Polygon
 from lib.models.image_ import Image_
 
-def loadPoly2PixProject(debug):
+def loadPoly2PixProject(debug, config):
     prj = Project()
     
     if debug:
-        project= "/home/pepv/Practiques/Segm/Software/sa_poly2pixel/projects/RM1/project.json"    
+        project= f'{config["projectDir"]}/{sorted(os.listdir(config["projectDir"]))[0]}/project.json'  
     else:
         # Directory explorer
         root = tk.Tk()

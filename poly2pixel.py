@@ -17,10 +17,23 @@ from lib.importAnnotations import *
 from lib.configure import *
 
 def main(args):
-    config = yaml.load(open("config.yml"))
+    if not os.path.exists('config.yml'):
+        default_config = dict(
+            debug = False,
+            projectDir = "./projects"
+        )
+
+        with open('config.yml', 'w') as config_file:
+            yaml.dump(default_config, config_file, default_flow_style=False)
+
+    config = yaml.load(open("config.yml"), Loader=yaml.FullLoader)
     config['debug'] = args.debug
     with open("config.yml",'w') as configFile:
         yaml.dump(config, configFile)
+
+    if not os.path.exists(f'{config["projectDir"]}'):
+        input(f'\n{bcolors.FAIL}Projects Folder not found (expected at {config["projectDir"]}), press a key to continue...{bcolors.ENDC}')
+        return
 
     project = None
 
@@ -69,7 +82,7 @@ def main(args):
             print(
 """{warning}
 ┏━━━━━━━━━━━━━ DEBUG ━━━━━━━━━━━━━┓
-┃ d1: Load placeholder project   ┃
+┃ d1: Load placeholder project    ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛{end}"""
             .format(warning = bcolors.WARNING, end = bcolors.ENDC)
             )
@@ -97,7 +110,7 @@ def main(args):
 
         elif choice == '3':
             project = None
-            project = loadPoly2PixProject(False)
+            project = loadPoly2PixProject(False, config)
 
         elif choice == '4':
             if project == None:
@@ -148,14 +161,14 @@ def main(args):
             if project == None:
                 input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
                 pass
-            else: augmentateData(project)
+            else: augmentateData(project, config)
 
         elif choice == '10':
             config = configure(project,config)
 
         elif choice == 'd1':
             project = None
-            project = loadPoly2PixProject(True)
+            project = loadPoly2PixProject(True, config)
 
         else:
             input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')
