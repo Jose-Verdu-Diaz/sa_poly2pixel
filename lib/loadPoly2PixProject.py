@@ -12,7 +12,7 @@ def loadPoly2PixProject(debug, config):
     prj = Project()
     
     if debug:
-        project= f'{config["projectDir"]}/{sorted(os.listdir(config["projectDir"]))[0]}/project.json'  
+        project= f'{config["projectDir"]}/{sorted(os.listdir(config["projectDir"]))[2]}/project.json'  
     else:
         # Directory explorer
         root = tk.Tk()
