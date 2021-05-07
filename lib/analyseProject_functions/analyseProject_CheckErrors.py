@@ -45,26 +45,33 @@ def ap_checkErrors(prj):
                         contours, hierarchy = cv2.findContours(img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 
                         if len(contours) > 1:
-                            print(f'{bcolors.FAIL}{cls} ## {file} ## {len(contours)}{bcolors.ENDC}')
+                            print(f'{bcolors.FAIL}{cls} ## {file} ## {len(contours)} ## {bcolors.ENDC}')
 
                             if not error_flag: 
                                 log.write(f'### {prj.classes[int(cls)-1].name} ({cls}) ###\n')
                                 error_flag=True
-                            log.write(f'\t{file}')
 
-                            im = cv2.imread(f'projects/{prj.name}/masks/{file.split("_")[0]}.bmp')
-                            f= os.path.splitext(f'{file.split("_")[0]}.bmp')[0]
-
+                            im = cv2.imread(f'projects/{prj.name}/img/{file.split("_")[0]}.jpg')                           
                             im_copy = im.copy()
 
-                            for j,img in enumerate(im_copy):
-                                black_pixels_mask = np.all(img != [int(cls), int(cls), int(cls)], axis=-1)
-                                non_black_pixels_mask = ~black_pixels_mask
+                            false_positive = False
+                            alpha = 0.8
+                            for cont in contours: 
+                                if cv2.contourArea(cont) <= 1:
+                                    false_positive=True
+                                    im_copy = cv2.drawContours(im_copy, [cont], -1, (0, 0, 255), -1)
+                                else:
+                                    im_copy = cv2.drawContours(im_copy, [cont], -1, (51, 197, 255), -1)
+                            filled = cv2.addWeighted(im, alpha, im_copy, 1-alpha, 0)
+                            for cont in contours: 
+                                if cv2.contourArea(cont) <= 1:
+                                    result = cv2.drawContours(filled, [cont], -1, (0, 0, 255), 0)
+                                else:
+                                    result = cv2.drawContours(filled, [cont], -1, (51, 197, 255), 0)
+                                    
+                            log.write(f'\t{file}\t[FALSE POSITIVE?]') if false_positive else log.write(f'\t{file}')
 
-                                img[black_pixels_mask] = [0, 0, 0]
-                                img[non_black_pixels_mask] = [199, 65, 72]
-
-                                cv2.imwrite(f'projects/{prj.name}/logs/repeated_img/{file}', img)
+                            cv2.imwrite(f'projects/{prj.name}/logs/repeated_img/{file}', result)
 
                             log.write('\n')
                         if i+1 == len(sorted(os.listdir(f'projects/{prj.name}/individual/{cls}'))) and error_flag: log.write('\n')
@@ -101,14 +108,18 @@ def ap_checkErrors(prj):
                             cache = 0
                         elif cache == 0 and len(contours) > 0:
                             cache = 1
+                            contour_cache = contours
                         elif cache == 1 and len(contours) > 0:
                             cache = 1
+                            contour_cache = contours
                         elif cache == 1 and len(contours) == 0:
                             cache = 2
                         elif cache == 2 and len(contours) == 0:
                             cache = 2
                         elif cache == 2 and len(contours) > 0:
-                            if not error_flag: 
+                            if not error_flag:
+                                for k,cont in enumerate(contours):
+                                    pass
                                 log.write(f'### {prj.classes[int(cls)-1].name} ({cls}) ###\n')
                                 error_flag=True
 

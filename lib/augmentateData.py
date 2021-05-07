@@ -30,41 +30,41 @@ def augment_seg(img,seg,seq):
 
     return image_aug , segmap_aug
 
-def aug_process(j,prmt,i,prjName,images,masks,counter,permutations,aug_key):
+def aug_process(j,prmt,i,prjName,images,masks,counter,permutations,aug_key, projectDir):
     name = ''
     for aug in prmt:
         name += str(aug_key[aug.__class__.__name__])
 
-    if not os.path.exists(f'projects/{prjName}/augmented/{i+1}_prmt/{name}/img'):
-        os.makedirs(f'projects/{prjName}/augmented/{i+1}_prmt/{name}/img')
+    if not os.path.exists(f'{projectDir}/{prjName}/augmented/{i+1}_prmt/{name}/img'):
+        os.makedirs(f'{projectDir}/{prjName}/augmented/{i+1}_prmt/{name}/img')
 
-    if not os.path.exists(f'projects/{prjName}/augmented/{i+1}_prmt/{name}/masks'):
-        os.makedirs(f'projects/{prjName}/augmented/{i+1}_prmt/{name}/masks')
+    if not os.path.exists(f'{projectDir}/{prjName}/augmented/{i+1}_prmt/{name}/masks'):
+        os.makedirs(f'{projectDir}/{prjName}/augmented/{i+1}_prmt/{name}/masks')
 
     seq = iaa.Sequential(prmt)
 
     for k,img in enumerate(images):
         image_aug,segmap_aug = augment_seg(
-            cv2.imread(f'projects/{prjName}/img/{img}'),
-            cv2.imread(f'projects/{prjName}/masks/{masks[k]}'),
+            cv2.imread(f'{projectDir}/{prjName}/img/{img}'),
+            cv2.imread(f'{projectDir}/{prjName}/masks/{masks[k]}'),
             seq
         )
-        cv2.imwrite(f'projects/{prjName}/augmented/{i+1}_prmt/{name}/img/{img.strip(".jpg")}-{i+1}_prmt-{name}-{k}.bmp', image_aug)
-        cv2.imwrite(f'projects/{prjName}/augmented/{i+1}_prmt/{name}/masks/{masks[k].strip(".jpg")}-{i+1}_prmt-{name}-{k}.bmp', segmap_aug)
+        cv2.imwrite(f'{projectDir}/{prjName}/augmented/{i+1}_prmt/{name}/img/{img.strip(".jpg")}-{i+1}_prmt-{name}-{k}.bmp', image_aug)
+        cv2.imwrite(f'{projectDir}/{prjName}/augmented/{i+1}_prmt/{name}/masks/{masks[k].strip(".jpg")}-{i+1}_prmt-{name}-{k}.bmp', segmap_aug)
 
         with counter.get_lock(): counter.value += 1
         printProgressBar(counter.value, permutations*len(images), prefix = 'Augmenting:', suffix = f'({counter.value}/{permutations*len(images)}) Complete', length = 50)
 
 
-def augmentateData(prj):
+def augmentateData(prj, config):
 
     # Stores tick and cross symbols for the menu 
     tick = dict([(True, f'{bcolors.OKGREEN}{bcolors.BOLD}✔{bcolors.ENDC}'), (False, f'{bcolors.FAIL}{bcolors.BOLD}✘{bcolors.ENDC}')])
 
     #Global vars
     prjName = prj.name
-    images = sorted(os.listdir(f'projects/{prjName}/img'))
-    masks = sorted(os.listdir(f'projects/{prjName}/masks'))
+    images = sorted(os.listdir(f'{config["projectDir"]}/{prjName}/img'))
+    masks = sorted(os.listdir(f'{config["projectDir"]}/{prjName}/masks'))
 
     #Stores the augmenters
     augmenters = [aug1,aug2,aug3,aug4,aug5,aug6,aug7,aug8]
@@ -124,13 +124,13 @@ def augmentateData(prj):
 
         elif choice == 9:
 
-            if os.path.exists(f'projects/{prjName}/augmented'):
-                shutil.rmtree(f'projects/{prjName}/augmented')
-            os.makedirs(f'projects/{prjName}/augmented')
+            if os.path.exists(f'{config["projectDir"]}/{prjName}/augmented'):
+                shutil.rmtree(f'{config["projectDir"]}/{prjName}/augmented')
+            os.makedirs(f'{config["projectDir"]}/{prjName}/augmented')
 
             aug_key = {k.__class__.__name__: v for v, k in enumerate(chosen_augmenters)}
 
-            with open(f'projects/{prjName}/augmented/augmenters.txt', 'w') as aug_file:
+            with open(f'{config["projectDir"]}/{prjName}/augmented/augmenters.txt', 'w') as aug_file:
                 for aug, i in aug_key.items():
                     aug_file.write(f'({i}) : {aug}\n')
 
@@ -142,7 +142,7 @@ def augmentateData(prj):
             for i,prmt_list in enumerate(all_permutations):             
                 processes =  []
                 for j,prmt in enumerate(prmt_list):
-                    p = multiprocessing.Process(target=aug_process, args=(j,prmt,i,prjName,images,masks,counter,permutations,aug_key))
+                    p = multiprocessing.Process(target=aug_process, args=(j,prmt,i,prjName,images,masks,counter,permutations,aug_key,config["projectDir"]))
                     processes.append(p)
                     p.start()
 

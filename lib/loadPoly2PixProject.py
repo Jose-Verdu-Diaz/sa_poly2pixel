@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
-import os, sys, json
-from PIL import Image, ImageDraw
+import json, os
 
 from lib.aux import *
 from lib.models.project import Project
@@ -9,11 +8,11 @@ from lib.models.class_ import Class_
 from lib.models.polygon import Polygon
 from lib.models.image_ import Image_
 
-def loadPoly2PixProject(debug):
+def loadPoly2PixProject(debug, config):
     prj = Project()
     
     if debug:
-        pass    
+        project= f'{config["projectDir"]}/{sorted(os.listdir(config["projectDir"]))[2]}/project.json'  
     else:
         # Directory explorer
         root = tk.Tk()
