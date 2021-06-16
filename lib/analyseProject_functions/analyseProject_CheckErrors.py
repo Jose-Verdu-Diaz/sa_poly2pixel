@@ -18,7 +18,7 @@ def ap_checkErrors(prj):
 
             ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
             ┃ 1 : Search class errors        ┃
-            ┃ 2 : Search missing annotations ┃
+            ┃ 2 : Search incoherence errors  ┃
             ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
             
             0 : Exit""")
@@ -80,10 +80,10 @@ def ap_checkErrors(prj):
 
         elif choice == '2':
 
-            if not os.path.exists(f'projects/{prj.name}/logs/missing_img'):
-                os.makedirs(f'projects/{prj.name}/logs/missing_img')
+            if not os.path.exists(f'projects/{prj.name}/logs/incoherence_img'):
+                os.makedirs(f'projects/{prj.name}/logs/incoherence_img')
 
-            with open(f'projects/{prj.name}/logs/missing_class.txt', 'w') as log:
+            with open(f'projects/{prj.name}/logs/incoherence_class.txt', 'w') as log:
                 dirs = sorted(os.listdir(f'projects/{prj.name}/individual'))
 
                 files_aux= sorted(os.listdir(f'projects/{prj.name}/individual/{dirs[0]}'))
@@ -94,6 +94,7 @@ def ap_checkErrors(prj):
                     ##      0 - Initial black
                     ##      1 - The image before had content
                     ##      2 - The image before didn't had content
+                    ##      3 - More than one images without content
                     error_flag = False
 
                     files= sorted(os.listdir(f'projects/{prj.name}/individual/{cls}'))
@@ -108,25 +109,71 @@ def ap_checkErrors(prj):
                             cache = 0
                         elif cache == 0 and len(contours) > 0:
                             cache = 1
-                            contour_cache = contours
                         elif cache == 1 and len(contours) > 0:
                             cache = 1
-                            contour_cache = contours
                         elif cache == 1 and len(contours) == 0:
                             cache = 2
                         elif cache == 2 and len(contours) == 0:
-                            cache = 2
-                        elif cache == 2 and len(contours) > 0:
+                            cache = 3
+                        elif cache == 2 and len(contours) > 0: # Missing image
                             if not error_flag:
                                 for k,cont in enumerate(contours):
                                     pass
                                 log.write(f'### {prj.classes[int(cls)-1].name} ({cls}) ###\n')
                                 error_flag=True
 
-                            print(f'\r{bcolors.FAIL}{cls} ## {files[i-1]} ## {len(contours)}{bcolors.ENDC}{"".join([*(" " for k in range(68))])}')
+                            print(f'\r{bcolors.FAIL}{cls} ## {files[j-1]} ## {len(contours)}{bcolors.ENDC}{"".join([*(" " for k in range(68))])}')
                             ## 68 is the part of the length of the progress bar, this is for "cleaning" the line. This is a dirty, hard-typed solution that should be improved.
-                            log.write(f'\t{files[j-1]}\n')
+                            log.write(f'\t{files[j-1]}\t[MISSING]\n')
                             cache = 1
+
+                            originalImg = cv2.imread(f'projects/{prj.name}/img/{files[j-1].split("_")[0]}.jpg')  
+                            originalImg_copy1 = originalImg.copy()
+                            originalImg_copy2 = originalImg.copy()
+
+                            preMask = cv2.imread(f'projects/{prj.name}/individual/{cls}/{files[j-2]}',cv2.IMREAD_GRAYSCALE)
+                            preMaskContours, hierarchy = cv2.findContours(preMask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)                      
+
+                            alpha = 0.8
+
+                            for cont in contours: originalImg_copy1 = cv2.drawContours(originalImg_copy1, [cont], -1, (20, 20, 227), -1)
+                            for preCont in preMaskContours: originalImg_copy2 = cv2.drawContours(originalImg_copy2, [preCont], -1, (209, 54, 23), -1)
+
+                            originalImg_copy = cv2.addWeighted(originalImg, alpha, originalImg_copy1, 1-alpha, 0)
+                            originalImg_copy = cv2.addWeighted(originalImg_copy, alpha, originalImg_copy2, 1-alpha, 0)
+
+                            for cont in contours: originalImg_copy = cv2.drawContours(originalImg_copy, [cont], -1, (20, 20, 227), 0)
+                            for preCont in preMaskContours: originalImg_copy = cv2.drawContours(originalImg_copy, [preCont], -1, (209, 54, 23), 0)
+                            
+                            cv2.imwrite(f'projects/{prj.name}/logs/incoherence_img/{files[j-1]}', originalImg_copy)
+                                  
+
+                        elif cache == 3 and len(contours) == 0:
+                            cache = 3
+                        elif cache == 3 and len(contours) > 0: # Unexpected image
+                            if not error_flag:
+                                for k,cont in enumerate(contours):
+                                    pass
+                                log.write(f'### {prj.classes[int(cls)-1].name} ({cls}) ###\n')
+                                error_flag=True
+
+                            print(f'\r{bcolors.FAIL}{cls} ## {files[j]} ## {len(contours)}{bcolors.ENDC}{"".join([*(" " for k in range(68))])}')
+                            ## 68 is the part of the length of the progress bar, this is for "cleaning" the line. This is a dirty, hard-typed solution that should be improved.
+                            log.write(f'\t{files[j]}\t[UNEXPECTED]\n')
+                            cache = 1
+
+                            originalImg = cv2.imread(f'projects/{prj.name}/img/{files[j].split("_")[0]}.jpg')  
+                            originalImg_copy = originalImg.copy()                   
+
+                            alpha = 0.8
+
+                            for cont in contours: originalImg_copy = cv2.drawContours(originalImg_copy, [cont], -1, (0, 179, 255), -1)
+
+                            originalImg_copy = cv2.addWeighted(originalImg, alpha, originalImg_copy, 1-alpha, 0)
+
+                            for cont in contours: originalImg_copy = cv2.drawContours(originalImg_copy, [cont], -1, (0, 179, 255), 0)
+                            
+                            cv2.imwrite(f'projects/{prj.name}/logs/incoherence_img/{files[j]}', originalImg_copy)
 
                         printProgressBar(i*len(files) + j + 1, len(dirs)*len(files), prefix = 'Analysing individual masks:', suffix = 'Complete', length = 50)
 

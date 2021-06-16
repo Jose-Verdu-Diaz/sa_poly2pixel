@@ -1,10 +1,6 @@
-import os, cv2, itertools, multiprocessing, random, shutil
+import os, cv2, itertools, multiprocessing, shutil
 import imgaug as ia
 import imgaug.augmenters as iaa
-from functools import partial
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
 
 from lib.aux import *
 from lib.analyseProject_functions.analyseProject_Classes import *

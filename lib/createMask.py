@@ -30,6 +30,7 @@ def createMask(prj):
             ┃ 1 : Black and white   ┃
             ┃ 2 : Default colors    ┃
             ┃ 3 : Individual masks  ┃
+            ┃ 4 : Binary masks      ┃
             ┗━━━━━━━━━━━━━━━━━━━━━━━┛
             
             0 : Exit""")
@@ -132,6 +133,27 @@ def createMask(prj):
                     cv2.imwrite(f'projects/{prj.name}/individual/{str(cls.id).zfill(4)}/{files[j]}_{str(cls.id).zfill(4)}.bmp', img)
                 
                     printProgressBar(i*len(ims) + j, len(prj.classes)*len(ims), prefix = 'Extracting individual masks:', suffix = f'({i*len(ims) + j}/{len(prj.classes)*len(ims)})', length = 50)
+
+        # Binary masks
+        elif choice == '4':
+            if not os.path.exists(f'projects/{prj.name}/img'):
+                input(f'\n{bcolors.FAIL}Import images first. Continue...{bcolors.ENDC}')
+                return
+
+            if not os.path.exists(f'projects/{prj.name}/binary_masks'):
+                os.makedirs(f'projects/{prj.name}/binary_masks')
+
+            for img in prj.images:
+                image = Image.open(f'projects/{prj.name}/img/{img.name}.jpg')
+                back = Image.new('L', (image.size[0],image.size[1]))
+                draw = ImageDraw.Draw(back)
+
+                for poly in img.polygons:
+                    draw.polygon(poly.points,fill = int(255),outline = int(255))
+
+                back.save(f'projects/{prj.name}/binary_masks/{img.name}.bmp', quality=100, subsampling=0)
+
+            input(f'\n{bcolors.OKGREEN}Binary masks created, press a key to continue...{bcolors.ENDC}')
 
         else:
             input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')
