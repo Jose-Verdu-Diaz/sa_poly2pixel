@@ -15,6 +15,7 @@ from lib.augmentateData import *
 from lib.importImages import *
 from lib.importAnnotations import *
 from lib.configure import *
+from lib.imageReduction import *
 
 def main(args):
     if not os.path.exists('config.yml'):
@@ -43,7 +44,8 @@ def main(args):
     2 : 'Analyse project',
     3 : 'Create Masks',
     4 : 'Export poly2pix project',
-    5 : 'Augmentate data'}
+    5 : 'Augmentate data',
+    6 : 'TEST'}
 
     while True:
 
@@ -67,14 +69,14 @@ def main(args):
 ┃  5: {1}          ┃
 ┣━━━━━━━━━━━━ ANALYSE ━━━━━━━━━━━━┫
 ┃  6: {2}             ┃
-┣━━━━━━━━━━━━━ MASK ━━━━━━━━━━━━━━┫
-┃  7: {3}                ┃
 ┣━━━━━━━━━━━━━ EXPORT ━━━━━━━━━━━━┫
-┃  8: {4}     ┃
-┣━━━━━━━━━━━ AUGMENTATE━━━━━━━━━━━┫
+┃  7: {4}     ┃
+┣━━━━━━━━━━━━━ TOOLS ━━━━━━━━━━━━━┫
+┃  8: {3}                ┃
 ┃  9: {5}             ┃
+┃ 10: {6}                        ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-  10: Configure
+  11: Configure
    0: Exit"""
         .format(*('\u0336'.join(menuOptions[opt]) + '\u0336' if project is None else menuOptions[opt] for opt in menuOptions)))
 
@@ -142,28 +144,34 @@ def main(args):
             if project == None:
                 input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
                 pass
+
+            else:
+                createProjectJson(project)
+                input(f'\n{bcolors.OKGREEN}Project exported, press a key to continue...{bcolors.ENDC}')
+
+        elif choice == '8':
+            if project == None:
+                input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
+                pass
             try:
                 createMask(project)
             except Exception as e:
                 print(str(e))
                 input(f'\n{bcolors.FAIL}Error creating masks, press a key to continue...{bcolors.ENDC}')
 
-        elif choice == '8':
-            if project == None:
-                input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
-                pass
-
-            else:
-                createProjectJson(project)
-                input(f'\n{bcolors.OKGREEN}Project exported, press a key to continue...{bcolors.ENDC}')
-
         elif choice == '9':
             if project == None:
                 input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
                 pass
             else: augmentateData(project, config)
-
+        
         elif choice == '10':
+            if project == None:
+                input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
+                pass
+            else: imageReduction(project)
+
+        elif choice == '11':
             config = configure(project,config)
 
         elif choice == 'd1':
