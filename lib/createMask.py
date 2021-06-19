@@ -10,7 +10,6 @@ from lib.models.image_ import Image_
 
 # Create image masks from the project object
 def createMask(prj):
-
     while True:
         os.system("clear")
         printHeader()
