@@ -45,7 +45,7 @@ def main(args):
     3 : 'Create Masks',
     4 : 'Export poly2pix project',
     5 : 'Augmentate data',
-    6 : 'TEST'}
+    6 : 'Reduce dimensions and classes'}
 
     while True:
 

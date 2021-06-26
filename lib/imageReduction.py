@@ -42,15 +42,19 @@ def imageReduction(prj):
 
         elif choice == '1':
 
-            if not os.path.exists(f'projects/{prj.name}/reduction_test/L'):
-                os.makedirs(f'projects/{prj.name}/reduction_test/L')
-            if not os.path.exists(f'projects/{prj.name}/reduction_test/R'):
-                os.makedirs(f'projects/{prj.name}/reduction_test/R')
+            prj_path = f'projects/{prj.name}'
+            output_path = f'{prj_path}/reduction_test'
 
-            for file in sorted(os.listdir(f'projects/{prj.name}/img')):
+            if not os.path.exists(f'{output_path}/L/img'): os.makedirs(f'{output_path}/L/img')
+            if not os.path.exists(f'{output_path}/L/masks'): os.makedirs(f'{output_path}/L/masks')
+            if not os.path.exists(f'{output_path}/R/img'): os.makedirs(f'{output_path}/R/img')
+            if not os.path.exists(f'{output_path}/R/masks'): os.makedirs(f'{output_path}/R/masks')
+
+            for file in sorted(os.listdir(f'{prj_path}/img')):
         
-                img = cv2.imread(f'projects/{prj.name}/img/{file}', cv2.IMREAD_GRAYSCALE)
-                img_rgb = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+                img = cv2.imread(f'{prj_path}/img/{file}', cv2.IMREAD_GRAYSCALE)
+                mask = cv2.imread(f'{prj_path}/masks/{file.strip(".jpg")}.bmp', cv2.IMREAD_GRAYSCALE)
+
                 centroids = []
 
                 success = False
@@ -63,9 +67,11 @@ def imageReduction(prj):
 
                     contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
                     
-                    if len(contours)==2:                      
-                        success = True
-                        break
+                    if len(contours)==2:
+                        # Make sure that both contours are legs
+                        if cv2.contourArea(contours[0])*0.8 <= cv2.contourArea(contours[1]) <= cv2.contourArea(contours[0])*1.2:                  
+                            success = True
+                            break
 
                 if not success:
                     print(f'{bcolors.FAIL}ERROR ## {file} ## {len(contours)} contours{bcolors.ENDC}')
@@ -82,55 +88,41 @@ def imageReduction(prj):
                 else:
                     # Derecha: Azul
                     # Izquierda: Rojo
-                        if centroids[0][0] > centroids[1][0]:
-                            cv2.drawContours(img_rgb, [contours[1]], -1, (0, 0, 255), 2)
-                            cv2.drawContours(img_rgb, [contours[0]], -1, (255, 0, 0), 2)
-                            cv2.circle(img_rgb, centroids[1], 3, (0, 0, 255), -1)
-                            cv2.circle(img_rgb, centroids[0], 3, (255, 0, 0), -1)
-                
-                        elif centroids[0][0] < centroids[1][0]:
-                            cv2.drawContours(img_rgb, [contours[0]], -1, (0, 0, 255), 2)
-                            cv2.drawContours(img_rgb, [contours[1]], -1, (255, 0, 0), 2)
-                            cv2.circle(img_rgb, centroids[0], 3, (0, 0, 255), -1)
-                            cv2.circle(img_rgb, centroids[1], 3, (255, 0, 0), -1)
+                    if centroids[0][0] > centroids[1][0]:
+                        legs = {'left':contours[1], 'right':contours[0]}
+                        centroids = {'left':centroids[1], 'right':centroids[0]}
+
+                    elif centroids[0][0] < centroids[1][0]:
+                        legs = {'left':contours[0], 'right':contours[1]}
+                        centroids = {'left':centroids[0], 'right':centroids[1]}
                             
-                        else: cv2.circle(img_rgb, (cX, cY), 3, (0, 255, 0), -1)
+                    else: print('Error')
 
                 background = np.zeros(img.shape, np.uint8)
 
-                if centroids[0][0] > centroids[1][0]:
-                    mask_L = cv2.drawContours(background.copy(), [contours[1]], -1, 255, -1)
-                    mask_R = cv2.drawContours(background.copy(), [contours[0]], -1, 255, -1)
+                leg_L = cv2.drawContours(background.copy(), [legs['left']], -1, 255, -1)
+                leg_R = cv2.drawContours(background.copy(), [legs['right']], -1, 255, -1)
 
-                elif centroids[0][0] < centroids[1][0]:
-                    mask_L = cv2.drawContours(background.copy(), [contours[0]], -1, 255, -1)
-                    mask_R = cv2.drawContours(background.copy(), [contours[1]], -1, 255, -1)
+                img_L = cv2.bitwise_and(img,img,mask = leg_L)
+                img_R = cv2.bitwise_and(img,img,mask = leg_R)
 
-                else: pass
+                mask_L = cv2.bitwise_and(mask,mask,mask = leg_L)
+                mask_R = cv2.bitwise_and(mask,mask,mask = leg_R)
 
-                img_L = cv2.bitwise_and(img,img,mask = mask_L)
-                img_R = cv2.bitwise_and(img,img,mask = mask_R)
+                x_L,y_L,w_L,h_L = cv2.boundingRect(legs['left'])
+                x_R,y_R,w_R,h_R = cv2.boundingRect(legs['right'])
 
-                if centroids[0][0] > centroids[1][0]:
-                    x,y,w,h = cv2.boundingRect(contours[1])
-                    box_L = cv2.rectangle(cv2.cvtColor(img_L, cv2.COLOR_GRAY2BGR),(x,y),(x+w,y+h),(0,255,0),2)
-                    cropped_L = img_L[y:y+h, x:x+w]
+                cropped_img_L = img_L[y_L:y_L+h_L, x_L:x_L+w_L]
+                cropped_img_R = cv2.flip(img_R[y_R:y_R+h_R, x_R:x_R+w_R], 1)
 
-                    x,y,w,h = cv2.boundingRect(contours[0])
-                    box_R = cv2.rectangle(cv2.cvtColor(img_R, cv2.COLOR_GRAY2BGR),(x,y),(x+w,y+h),(0,255,0),2)
-                    cropped_R = cv2.flip(img_R[y:y+h, x:x+w], 1)
+                cropped_mask_L = mask_L[y_L:y_L+h_L, x_L:x_L+w_L]
+                cropped_mask_R = cv2.flip(mask_R[y_R:y_R+h_R, x_R:x_R+w_R], 1)
 
-                elif centroids[0][0] < centroids[1][0]:
-                    x,y,w,h = cv2.boundingRect(contours[0])
-                    box_L = cv2.rectangle(cv2.cvtColor(img_L, cv2.COLOR_GRAY2BGR),(x,y),(x+w,y+h),(0,255,0),2)
-                    cropped_L = img_L[y:y+h, x:x+w]
+                cv2.imwrite(f'{output_path}/L/img/{file.strip(".jpg")}_L.jpg', cropped_img_L, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+                cv2.imwrite(f'{output_path}/R/img/{file.strip(".jpg")}_R.jpg', cropped_img_R, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
 
-                    x,y,w,h = cv2.boundingRect(contours[1])
-                    box_R = cv2.rectangle(cv2.cvtColor(img_R, cv2.COLOR_GRAY2BGR),(x,y),(x+w,y+h),(0,255,0),2)
-                    cropped_R = cv2.flip(img_R[y:y+h, x:x+w], 1)
-
-                cv2.imwrite(f'projects/{prj.name}/reduction_test/L/{file.strip(".jpg")}_L.jpg', cropped_L, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                cv2.imwrite(f'projects/{prj.name}/reduction_test/R/{file.strip(".jpg")}_R.jpg', cropped_R, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+                cv2.imwrite(f'{output_path}/L/masks/{file.strip(".jpg")}_L.bmp', cropped_mask_L)
+                cv2.imwrite(f'{output_path}/R/masks/{file.strip(".jpg")}_R.bmp', cropped_mask_R)
 
             input(f'\n{bcolors.OKGREEN}END...{bcolors.ENDC}')
 
