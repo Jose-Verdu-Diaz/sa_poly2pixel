@@ -31,7 +31,7 @@ def loadExportedProject():
 
     maskFiles = sorted(os.listdir(prj.projectDir + '/annotations'))
     imageFiles = sorted(os.listdir(prj.projectDir + '/img'))
-    classFile = prj.projectDir + 'classes.json'
+    classFile = prj.projectDir + '/classes.json'
 
     _images = []
 
@@ -61,7 +61,7 @@ def loadExportedProject():
     prj.images = _images
 
     # Load classes.json
-    with open(prj.projectDir + '/classes.json') as f:
+    with open(classFile) as f:
         data = json.load(f)
 
         classes = []

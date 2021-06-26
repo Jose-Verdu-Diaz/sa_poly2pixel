@@ -61,21 +61,22 @@ def main(args):
 """
 \nChoose service you want to use :
 
-┏━━━━━━━━━━━━━ IMPORT ━━━━━━━━━━━━┓
-┃  1: Import SA project           ┃
-┃  2: Import exported SA projects ┃
-┃  3: Import poly2pix project     ┃
-┃  4: {0}               ┃
-┃  5: {1}          ┃
-┣━━━━━━━━━━━━ ANALYSE ━━━━━━━━━━━━┫
-┃  6: {2}             ┃
-┣━━━━━━━━━━━━━ EXPORT ━━━━━━━━━━━━┫
-┃  7: {4}     ┃
-┣━━━━━━━━━━━━━ TOOLS ━━━━━━━━━━━━━┫
-┃  8: {3}                ┃
-┃  9: {5}             ┃
-┃ 10: {6}                        ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━ IMPORT ━━━━━━━━━━━━━┓
+┃  1: Import SA project             ┃
+┃  2: Import exported SA projects   ┃
+┃  3: Import poly2pix project       ┃
+┃  4: {0}                 ┃
+┃  5: {1}            ┃
+┣━━━━━━━━━━━━━ ANALYSE ━━━━━━━━━━━━━┫
+┃  6: {2}               ┃
+┣━━━━━━━━━━━━━━ EXPORT ━━━━━━━━━━━━━┫
+┃  7: {4}       ┃
+┣━━━━━━━━━━━━━━ TOOLS ━━━━━━━━━━━━━━┫
+┃  8: {3}                  ┃
+┃  9: {5}               ┃
+┃ 10: {6} ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+                                 
   11: Configure
    0: Exit"""
         .format(*('\u0336'.join(menuOptions[opt]) + '\u0336' if project is None else menuOptions[opt] for opt in menuOptions)))
@@ -153,11 +154,14 @@ def main(args):
             if project == None:
                 input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
                 pass
+            '''
             try:
                 createMask(project)
             except Exception as e:
                 print(str(e))
                 input(f'\n{bcolors.FAIL}Error creating masks, press a key to continue...{bcolors.ENDC}')
+            '''
+            createMask(project)
 
         elif choice == '9':
             if project == None:

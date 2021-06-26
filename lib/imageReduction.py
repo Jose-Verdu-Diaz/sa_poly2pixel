@@ -27,7 +27,7 @@ def imageReduction(prj):
             \nChoose an option:
 
             ┏━━━━━━━━━━━━━━━━━━━━━━━┓
-            ┃ 1 : TEST              ┃
+            ┃ 1 : Separate legs     ┃
             ┗━━━━━━━━━━━━━━━━━━━━━━━┛
             
             0 : Exit""")
@@ -43,7 +43,7 @@ def imageReduction(prj):
         elif choice == '1':
 
             prj_path = f'projects/{prj.name}'
-            output_path = f'{prj_path}/reduction_test'
+            output_path = f'{prj_path}/reduction'
 
             if not os.path.exists(f'{output_path}/L/img'): os.makedirs(f'{output_path}/L/img')
             if not os.path.exists(f'{output_path}/L/masks'): os.makedirs(f'{output_path}/L/masks')
@@ -124,7 +124,7 @@ def imageReduction(prj):
                 cv2.imwrite(f'{output_path}/L/masks/{file.strip(".jpg")}_L.bmp', cropped_mask_L)
                 cv2.imwrite(f'{output_path}/R/masks/{file.strip(".jpg")}_R.bmp', cropped_mask_R)
 
-            input(f'\n{bcolors.OKGREEN}END...{bcolors.ENDC}')
+            input(f'\n{bcolors.OKGREEN}Images and classes reduced...{bcolors.ENDC}')
 
         else:
             input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')
