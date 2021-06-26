@@ -10,7 +10,6 @@ from lib.models.image_ import Image_
 
 # Create image masks from the project object
 def createMask(prj):
-
     while True:
         os.system("clear")
         printHeader()
@@ -30,6 +29,8 @@ def createMask(prj):
             ┃ 1 : Black and white   ┃
             ┃ 2 : Default colors    ┃
             ┃ 3 : Individual masks  ┃
+            ┃ 4 : Binary masks      ┃
+            ┃ 5 : Mono masks        ┃
             ┗━━━━━━━━━━━━━━━━━━━━━━━┛
             
             0 : Exit""")
@@ -132,6 +133,63 @@ def createMask(prj):
                     cv2.imwrite(f'projects/{prj.name}/individual/{str(cls.id).zfill(4)}/{files[j]}_{str(cls.id).zfill(4)}.bmp', img)
                 
                     printProgressBar(i*len(ims) + j, len(prj.classes)*len(ims), prefix = 'Extracting individual masks:', suffix = f'({i*len(ims) + j}/{len(prj.classes)*len(ims)})', length = 50)
+
+        # Binary masks
+        elif choice == '4':
+            if not os.path.exists(f'projects/{prj.name}/img'):
+                input(f'\n{bcolors.FAIL}Import images first. Continue...{bcolors.ENDC}')
+                return
+
+            if not os.path.exists(f'projects/{prj.name}/binary_masks'):
+                os.makedirs(f'projects/{prj.name}/binary_masks')
+
+            for img in prj.images:
+                image = Image.open(f'projects/{prj.name}/img/{img.name}.jpg')
+                back = Image.new('L', (image.size[0],image.size[1]))
+                draw = ImageDraw.Draw(back)
+
+                for poly in img.polygons:
+                    draw.polygon(poly.points,fill = int(255),outline = int(255))
+
+                back.save(f'projects/{prj.name}/binary_masks/{img.name}.bmp', quality=100, subsampling=0)
+
+            input(f'\n{bcolors.OKGREEN}Binary masks created, press a key to continue...{bcolors.ENDC}')
+
+        elif choice == '5':
+            if not os.path.exists(f'projects/{prj.name}/img'):
+                input(f'\n{bcolors.FAIL}Import images first. Continue...{bcolors.ENDC}')
+                return
+
+            if not os.path.exists(f'projects/{prj.name}/mono_masks'):
+                os.makedirs(f'projects/{prj.name}/mono_masks')
+
+            # Only 255 supported classes. Check project.
+            if len(prj.classes) >= 255:
+                input(f'\n{bcolors.FAIL}Only 255 classes supported in Black and White.\nThere are {len(prj.classes)}, press a key to continue...{bcolors.ENDC}')
+                return
+
+            for img in prj.images:
+                image = Image.open(f'projects/{prj.name}/img/{img.name}.jpg')
+                back = Image.new('L', (image.size[0],image.size[1]))
+                draw = ImageDraw.Draw(back)
+
+                for poly in img.polygons:
+
+                    name = prj.classes[int(poly.classId) - 1].name
+                    left = name.endswith('_L')
+
+                    if left:
+                        search = name.replace('_L','_R')
+                        color = next((cls.id for cls in prj.classes if cls.name == search), None)
+                    else: color = poly.classId
+                    
+                    if color == None: print(name)
+
+                    draw.polygon(poly.points,fill = color,outline = color)
+
+                back.save(f'projects/{prj.name}/mono_masks/{img.name}.bmp', quality=100, subsampling=0)
+
+            input(f'\n{bcolors.OKGREEN}Black and White mono masks created, press a key to continue...{bcolors.ENDC}')
 
         else:
             input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')

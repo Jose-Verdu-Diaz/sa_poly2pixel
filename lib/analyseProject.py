@@ -15,7 +15,7 @@ def analyseProject(prj):
                 {bcolors.BOLD}Name:{bcolors.ENDC} {prj.name}
             {bcolors.BOLD}Directory:{bcolors.ENDC} {prj.projectDir}
         {bcolors.BOLD}Nº of images:{bcolors.ENDC} {len(prj.images)}
-        {bcolors.BOLD}Nº of classes:{bcolors.ENDC} {len(prj.classes)}
+        {bcolors.BOLD}Nº of classes:{bcolors.ENDC} {len(prj.classes) + 1}
         ''')
 
         print("""
