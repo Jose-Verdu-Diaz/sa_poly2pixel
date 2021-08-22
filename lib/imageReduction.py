@@ -8,6 +8,26 @@ from lib.analyseProject_functions.analyseProject_EditProject import *
 import cv2
 import numpy as np
 
+def resize_img(im, output_size):
+    old_size = im.shape[:2] # old_size is in (height, width) format
+
+    ratio = float(output_size)/max(old_size)
+    new_size = tuple([int(x*ratio) for x in old_size])
+
+    # new_size should be in (width, height) format
+
+    im = cv2.resize(im, (new_size[1], new_size[0]), interpolation = cv2.INTER_NEAREST)
+
+    delta_w = output_size - new_size[1]
+    delta_h = output_size - new_size[0]
+    top, bottom = delta_h//2, delta_h-(delta_h//2)
+    left, right = delta_w//2, delta_w-(delta_w//2)
+
+    color = 0
+    result_im = cv2.copyMakeBorder(im, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color)
+
+    return result_im
+
 def imageReduction(prj):
     while True:
         os.system("clear")
@@ -42,6 +62,9 @@ def imageReduction(prj):
 
         elif choice == '1':
 
+            diff = 0.2
+            target_size = 128
+
             prj_path = f'projects/{prj.name}'
             output_path = f'{prj_path}/reduction'
 
@@ -53,7 +76,7 @@ def imageReduction(prj):
             for file in sorted(os.listdir(f'{prj_path}/img')):
         
                 img = cv2.imread(f'{prj_path}/img/{file}', cv2.IMREAD_GRAYSCALE)
-                mask = cv2.imread(f'{prj_path}/masks/{file.strip(".jpg")}.bmp', cv2.IMREAD_GRAYSCALE)
+                mask = cv2.imread(f'{prj_path}/mono_masks/{file.strip(".jpg")}.bmp', cv2.IMREAD_GRAYSCALE)
 
                 centroids = []
 
@@ -69,7 +92,7 @@ def imageReduction(prj):
                     
                     if len(contours)==2:
                         # Make sure that both contours are legs
-                        if cv2.contourArea(contours[0])*0.8 <= cv2.contourArea(contours[1]) <= cv2.contourArea(contours[0])*1.2:                  
+                        if cv2.contourArea(contours[0])*(1-diff) <= cv2.contourArea(contours[1]) <= cv2.contourArea(contours[0])*(1+diff):                  
                             success = True
                             break
 
@@ -118,11 +141,17 @@ def imageReduction(prj):
                 cropped_mask_L = mask_L[y_L:y_L+h_L, x_L:x_L+w_L]
                 cropped_mask_R = cv2.flip(mask_R[y_R:y_R+h_R, x_R:x_R+w_R], 1)
 
-                cv2.imwrite(f'{output_path}/L/img/{file.strip(".jpg")}_L.jpg', cropped_img_L, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                cv2.imwrite(f'{output_path}/R/img/{file.strip(".jpg")}_R.jpg', cropped_img_R, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+                resized_img_L = resize_img(cropped_img_L, target_size)
+                resized_img_R = resize_img(cropped_img_R, target_size)
 
-                cv2.imwrite(f'{output_path}/L/masks/{file.strip(".jpg")}_L.bmp', cropped_mask_L)
-                cv2.imwrite(f'{output_path}/R/masks/{file.strip(".jpg")}_R.bmp', cropped_mask_R)
+                resized_mask_L = resize_img(cropped_mask_L, target_size)
+                resized_mask_R = resize_img(cropped_mask_R, target_size)
+
+                cv2.imwrite(f'{output_path}/L/img/{file.strip(".jpg")}_L.jpg', resized_img_L, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+                cv2.imwrite(f'{output_path}/R/img/{file.strip(".jpg")}_R.jpg', resized_img_R, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+
+                cv2.imwrite(f'{output_path}/L/masks/{file.strip(".jpg")}_L.bmp', resized_mask_L)
+                cv2.imwrite(f'{output_path}/R/masks/{file.strip(".jpg")}_R.bmp', resized_mask_R)
 
             input(f'\n{bcolors.OKGREEN}Images and classes reduced...{bcolors.ENDC}')
 

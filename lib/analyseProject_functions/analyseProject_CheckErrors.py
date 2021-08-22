@@ -36,16 +36,23 @@ def ap_checkErrors(prj):
             if not os.path.exists(f'projects/{prj.name}/logs/repeated_img'):
                 os.makedirs(f'projects/{prj.name}/logs/repeated_img')
 
+            dirs = sorted(os.listdir(f'projects/{prj.name}/individual'))
+            files_aux= sorted(os.listdir(f'projects/{prj.name}/individual/{dirs[0]}'))
+            printProgressBar(0, len(dirs)*len(files_aux), prefix = 'Analysing individual masks:', suffix = 'Complete', length = 50)
+
             with open(f'projects/{prj.name}/logs/repeated_class.txt', 'w') as log:
-                for cls in sorted(os.listdir(f'projects/{prj.name}/individual')):
+
+                for i,cls in enumerate(dirs):
+             
                     error_flag = False
 
-                    for i,file in enumerate(sorted(os.listdir(f'projects/{prj.name}/individual/{cls}'))):
+                    files= sorted(os.listdir(f'projects/{prj.name}/individual/{cls}'))
+                    for j,file in enumerate(files):
                         img = cv2.imread(f'projects/{prj.name}/individual/{cls}/{file}',cv2.IMREAD_GRAYSCALE)
                         contours, hierarchy = cv2.findContours(img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 
                         if len(contours) > 1:
-                            print(f'{bcolors.FAIL}{cls} ## {file} ## {len(contours)} ## {bcolors.ENDC}')
+                            print(f'\r{bcolors.FAIL}{cls} ## {file} ## {len(contours)}{bcolors.ENDC}{"".join([*(" " for k in range(68))])}')
 
                             if not error_flag: 
                                 log.write(f'### {prj.classes[int(cls)-1].name} ({cls}) ###\n')
@@ -74,9 +81,12 @@ def ap_checkErrors(prj):
                             cv2.imwrite(f'projects/{prj.name}/logs/repeated_img/{file}', result)
 
                             log.write('\n')
-                        if i+1 == len(sorted(os.listdir(f'projects/{prj.name}/individual/{cls}'))) and error_flag: log.write('\n')
 
-            input('Continue')
+                        printProgressBar(i*len(files) + j + 1, len(dirs)*len(files), prefix = 'Analysing individual masks:', suffix = 'Complete', length = 50)
+
+                        if j+1 == len(sorted(os.listdir(f'projects/{prj.name}/individual/{cls}'))) and error_flag: log.write('\n')
+
+            input('\nContinue')
 
         elif choice == '2':
 

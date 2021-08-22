@@ -17,7 +17,7 @@ def loadPoly2PixProject(debug, config):
         # Directory explorer
         root = tk.Tk()
         root.withdraw()
-        project = filedialog.askopenfilename()
+        project = filedialog.askopenfilename(initialdir=config['projectDir'],filetypes=[('Project file', 'project.json')])
     
     if not isinstance(project, str) or project == '': 
         input(f'\n{bcolors.FAIL}No project selected, press a key to continue...{bcolors.ENDC}')

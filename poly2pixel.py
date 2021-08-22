@@ -21,7 +21,8 @@ def main(args):
     if not os.path.exists('config.yml'):
         default_config = dict(
             debug = False,
-            projectDir = "./projects"
+            projectDir = "./projects",
+            exportedSaDir = "./projects"
         )
 
         with open('config.yml', 'w') as config_file:
@@ -109,7 +110,7 @@ def main(args):
 
         elif choice == '2':
             project = None
-            project = loadExportedProject()      
+            project = loadExportedProject(config)      
 
         elif choice == '3':
             project = None

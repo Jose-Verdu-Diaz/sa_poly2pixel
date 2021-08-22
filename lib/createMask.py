@@ -1,4 +1,4 @@
-import os, cv2
+import os, cv2, json
 from PIL import Image, ImageDraw
 import numpy as np
 
@@ -156,6 +156,15 @@ def createMask(prj):
             input(f'\n{bcolors.OKGREEN}Binary masks created, press a key to continue...{bcolors.ENDC}')
 
         elif choice == '5':
+
+            mono_classFile = prj.projectDir + '/classes_mono.json'
+
+            with open(mono_classFile) as f:
+                data = json.load(f)
+                classes = []
+
+                for d in data: classes.append(Class_(d["color"],d["id"],d["name"]))
+
             if not os.path.exists(f'projects/{prj.name}/img'):
                 input(f'\n{bcolors.FAIL}Import images first. Continue...{bcolors.ENDC}')
                 return
@@ -176,12 +185,8 @@ def createMask(prj):
                 for poly in img.polygons:
 
                     name = prj.classes[int(poly.classId) - 1].name
-                    left = name.endswith('_L')
-
-                    if left:
-                        search = name.replace('_L','_R')
-                        color = next((cls.id for cls in prj.classes if cls.name == search), None)
-                    else: color = poly.classId
+                    search = name.replace('_L','').replace('_R','')
+                    color = next((cls.id for cls in classes if cls.name == search), None)
                     
                     if color == None: print(name)
 
