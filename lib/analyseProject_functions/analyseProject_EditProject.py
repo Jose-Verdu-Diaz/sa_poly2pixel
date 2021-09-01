@@ -30,6 +30,7 @@ def ap_editProject(prj):
         if choice == '0':
             return
 
+        ## Shifts the class Id of the polygons of the poly2pixel project
         elif choice == '1':
             shift = int(input('Shift classes id by:'))
 
@@ -55,6 +56,7 @@ def ap_editProject(prj):
 
                 input(f'Continue...')
 
+        ## Shifts the class Id of the annotations files of the exported SA project
         elif choice == '2':      
 
             shift = int(input('Shift classes id by:'))

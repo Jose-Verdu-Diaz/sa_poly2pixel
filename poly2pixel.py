@@ -9,6 +9,7 @@ from lib.createProjectJson import *
 from lib.loadExportedProject import *
 from lib.loadProject import *
 from lib.loadPoly2PixProject import *
+from lib.projectExplorer import *
 from lib.analyseProject import *
 from lib.showSequence import *
 from lib.augmentateData import *
@@ -66,19 +67,20 @@ def main(args):
 ┃  1: Import SA project             ┃
 ┃  2: Import exported SA projects   ┃
 ┃  3: Import poly2pix project       ┃
-┃  4: {0}                 ┃
-┃  5: {1}            ┃
+┃  4: Open project explorer         ┃
+┃  5: {0}                 ┃
+┃  6: {1}            ┃
 ┣━━━━━━━━━━━━━ ANALYSE ━━━━━━━━━━━━━┫
-┃  6: {2}               ┃
+┃  7: {2}               ┃
 ┣━━━━━━━━━━━━━━ EXPORT ━━━━━━━━━━━━━┫
-┃  7: {4}       ┃
+┃  8: {4}       ┃
 ┣━━━━━━━━━━━━━━ TOOLS ━━━━━━━━━━━━━━┫
-┃  8: {3}                  ┃
-┃  9: {5}               ┃
-┃ 10: {6} ┃
+┃  9: {3}                  ┃
+┃ 10: {5}               ┃
+┃ 11: {6} ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
                                  
-  11: Configure
+  12: Configure
    0: Exit"""
         .format(*('\u0336'.join(menuOptions[opt]) + '\u0336' if project is None else menuOptions[opt] for opt in menuOptions)))
 
@@ -117,6 +119,10 @@ def main(args):
             project = loadPoly2PixProject(False, config)
 
         elif choice == '4':
+            project = None
+            project = projectExplorer(config)
+
+        elif choice == '5':
             if project == None:
                 input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
                 pass
@@ -125,7 +131,7 @@ def main(args):
                 importImages(project)
                 input(f'\n{bcolors.OKGREEN}Images imported, press a key to continue...{bcolors.ENDC}')
 
-        elif choice == '5':
+        elif choice == '6':
             if project == None:
                 input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
                 pass
@@ -134,7 +140,7 @@ def main(args):
                 importAnnotations(project)
                 input(f'\n{bcolors.OKGREEN}Annotations imported, press a key to continue...{bcolors.ENDC}')
 
-        elif choice == '6':
+        elif choice == '7':
             if project == None:
                 input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
                 pass
@@ -142,7 +148,7 @@ def main(args):
             else:
                 analyseProject(project)
 
-        elif choice == '7':
+        elif choice == '8':
             if project == None:
                 input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
                 pass
@@ -151,7 +157,7 @@ def main(args):
                 createProjectJson(project)
                 input(f'\n{bcolors.OKGREEN}Project exported, press a key to continue...{bcolors.ENDC}')
 
-        elif choice == '8':
+        elif choice == '9':
             if project == None:
                 input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
                 pass
@@ -164,19 +170,19 @@ def main(args):
             '''
             createMask(project)
 
-        elif choice == '9':
+        elif choice == '10':
             if project == None:
                 input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
                 pass
             else: augmentateData(project, config)
         
-        elif choice == '10':
+        elif choice == '11':
             if project == None:
                 input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
                 pass
             else: imageReduction(project)
 
-        elif choice == '11':
+        elif choice == '12':
             config = configure(project,config)
 
         elif choice == 'd1':

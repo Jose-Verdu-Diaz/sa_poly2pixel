@@ -1,0 +1,102 @@
+###############################
+### File Naming Convention  ###
+###############################
+
+    File names follow the following structure:
+
+        pppp-ssss_cccc.bmp
+
+    - pppp:     MRI identificator
+    - ssss:     Slice identificator
+    - cccc:     Class (muscle) identificator
+
+    Use the slice identificator to locate the error in the MRI stack
+
+###############################
+####      Error types      ####
+###############################
+
+    ######### repeated_class ########
+
+        We assume that only one instance of a class (muscle) can exist in a slice.
+        When more than one instance of a class is found in a slice, the program 
+        raises an error flag. 
+
+        == False Positives ==
+        Ocasionally, some pixels of the mask might be isolated from the rest.This 
+        happens on fine detailed selections. The program is able to detect most 
+        false positives, and marks them with the flag '[FALSE POSITIVE?]'.
+
+    ######### incoherence_class ########
+
+        We assume that the classes (muscles) are continous between slices. 
+        For example, given 6 consecutive slices (a,b,c,d,e,f):
+
+            - If a class is present in slices 'a,b,c,e' and 'f' then it should also 
+              be in slice 'd'. If this is not the case, the program raises an error 
+              and marks it with the '[MISSING]' flag.
+
+            - If the slices 'a,b,c,e' and 'f' are empty, then slice 'd' should also 
+              be. If this is not the case, the program raises an error and marks it 
+              with the '[UNEXPECTED]' flag.
+
+        == False Positives ==
+        There are plenty of special cases where the program could raise a false 
+        positive. The program is not cappable of recognising any of them, thus 
+        making necessary some manual checking.
+
+    ######### displacement_class ########
+
+        We assume that classes (muscles) between slices are spatially continous.
+        For example, assume we have a class 'C' present in 2 continous slices, 'a'
+        and 'b'. The position of 'C' will be similar in both slices, then some of 
+        the pixels of 'a' that are part of 'C' will remain in 'b':
+
+                    a                                   b
+            · · · · · · · · ·                   · · · · · · · · ·
+            · · C C C C C · ·                   · · · C C C · · · 
+            · C C C C C C C ·                   · · C C C C C · ·
+            · C C C C C C C ·                   · · C C C C C · ·
+            · C C C C C C · ·                   · · C C C C · · ·
+            · C C C C C · · ·                   · · · C C · · · ·
+            · · C C C · · · ·                   · · · · · · · · ·
+            · · · · · · · · ·                   · · · · · · · · ·
+
+        If less than 5% of the pixels are shared, the program raises an error.
+        The error will be followed with the amount of shared pixels in the from
+        '[x%]'.
+
+        == False Positives ==
+
+        The program will raise LOTS of false positives. The program is not 
+        cappable of recognising any of them, thus making necessary some manual 
+        checking.
+
+
+###############################
+#### Error images coloring ####
+###############################
+
+    ######### repeated_img ########
+        
+        - Yellow:   Indicates the repeated muscles
+        - Red:      Indicates the region that caused a (possible) false positive
+
+    ######### incoherence_img ########
+        
+        (If there is an unexpected muscle)
+        - Yellow:   Indicates an unexpected muscle
+
+        (If there is a missing muscle)
+        - Red:      Indicates the position of the muscle in the previous slice
+        - Blue:     Indicates the position of the muscle in the next slice
+
+    ######### displacement_img ########
+        
+        - Red:      Indicates the position of the muscle in the previous slice
+        - Blue:     Indicates the position of the muscle in the current slice
+        - Green:    Indicates the overlapping pixels of the muscles in the previous
+                    and current slices
+
+        Images also display the percentage of the current mask that overlaps with
+        the last mask.
