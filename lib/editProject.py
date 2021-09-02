@@ -5,7 +5,7 @@ from lib.showSequence import *
 from lib.aux import *
 
 
-def ap_editProject(prj):
+def editProject(prj):
     while True:
         os.system("clear")
         printHeader()

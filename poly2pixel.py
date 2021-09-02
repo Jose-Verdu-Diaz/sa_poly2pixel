@@ -17,6 +17,7 @@ from lib.importImages import *
 from lib.importAnnotations import *
 from lib.configure import *
 from lib.imageReduction import *
+from lib.editProject import *
 
 def main(args):
     if not os.path.exists('config.yml'):
@@ -47,7 +48,8 @@ def main(args):
     3 : 'Create Masks',
     4 : 'Export poly2pix project',
     5 : 'Augmentate data',
-    6 : 'Reduce dimensions and classes'}
+    6 : 'Reduce dimensions and classes',
+    7 : 'Edit project'}
 
     while True:
 
@@ -78,9 +80,10 @@ def main(args):
 ┃  9: {3}                  ┃
 ┃ 10: {5}               ┃
 ┃ 11: {6} ┃
+┃ 12: {7} ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
                                  
-  12: Configure
+  13: Configure
    0: Exit"""
         .format(*('\u0336'.join(menuOptions[opt]) + '\u0336' if project is None else menuOptions[opt] for opt in menuOptions)))
 
@@ -183,6 +186,9 @@ def main(args):
             else: imageReduction(project)
 
         elif choice == '12':
+            editProject(project)
+
+        elif choice == '13':
             config = configure(project,config)
 
         elif choice == 'd1':

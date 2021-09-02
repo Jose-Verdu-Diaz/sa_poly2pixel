@@ -6,7 +6,6 @@ from lib.aux import *
 from lib.analyseProject_functions.analyseProject_Classes import *
 from lib.analyseProject_functions.analyseProject_Images import *
 from lib.analyseProject_functions.analyseProject_CheckErrors import *
-from lib.analyseProject_functions.analyseProject_EditProject import *
 
 aug1 = iaa.ElasticTransformation(alpha=70.0, sigma=13.0)
 aug2 = iaa.Fliplr(1)

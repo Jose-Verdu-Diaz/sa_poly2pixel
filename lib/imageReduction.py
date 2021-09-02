@@ -3,7 +3,6 @@ from lib.aux import *
 from lib.analyseProject_functions.analyseProject_Classes import *
 from lib.analyseProject_functions.analyseProject_Images import *
 from lib.analyseProject_functions.analyseProject_CheckErrors import *
-from lib.analyseProject_functions.analyseProject_EditProject import *
 
 import cv2
 import numpy as np

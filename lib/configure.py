@@ -12,9 +12,10 @@ def configure(prj,config):
         print("""
             \nChoose an option:
 
-            ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-            ┃ 1 : Change projects folder       ┃
-            ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+            ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+            ┃ 1 : Change projects folder             ┃
+            ┃ 2 : Change exported SA projects folder ┃
+            ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
             
             0 : Exit""")
 
@@ -42,6 +43,17 @@ def configure(prj,config):
 
                 with open("config.yml",'w') as configFile:
                     yaml.dump(config, configFile)
+
+        elif choice == '2':
+            # Directory explorer
+            root = tk.Tk()
+            root.withdraw()
+            
+            config['exportedSaDir'] = filedialog.askdirectory()
+
+            with open("config.yml",'w') as configFile:
+                yaml.dump(config, configFile)
+
 
         else:
             input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')
