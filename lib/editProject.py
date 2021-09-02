@@ -3,9 +3,10 @@ import os, json
 from lib.aux import *
 from lib.showSequence import *
 from lib.aux import *
+from lib.createProjectJson import *
 
 
-def editProject(prj):
+def editProject(prj, config):
     while True:
         os.system("clear")
         printHeader()
@@ -17,6 +18,7 @@ def editProject(prj):
             ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
             ┃ 1 : Shift class id (imported)    ┃
             ┃ 2 : Shift class id (unimported)  ┃
+            ┃ 3 : Rename project               ┃
             ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
             
             0 : Exit""")
@@ -32,7 +34,7 @@ def editProject(prj):
 
         ## Shifts the class Id of the polygons of the poly2pixel project
         elif choice == '1':
-            shift = int(input('Shift classes id by:'))
+            shift = int(input('Shift classes id by: '))
 
             if prj.classes[0].id + shift < 1:              
                 input(f'The resulting first class will have an index of {str(prj.classes[0].id + shift)}. That is not possible.\nContinue...')
@@ -59,7 +61,7 @@ def editProject(prj):
         ## Shifts the class Id of the annotations files of the exported SA project
         elif choice == '2':      
 
-            shift = int(input('Shift classes id by:'))
+            shift = int(input('Shift classes id by: '))
 
             if prj.classes[0].id + shift < 1:              
                 input(f'The resulting first class will have an index of {str(prj.classes[0].id + shift)}. That is not possible.\nContinue...')
@@ -76,7 +78,19 @@ def editProject(prj):
 
                     printProgressBar(i+1, len(annotation_files), prefix = 'Shifting id:', suffix = 'Complete', length = 50)
             
-                input(f'\nContinue...')            
+                input(f'\nContinue...')      
+
+        elif choice == '3':
+
+            new_name = input('Enter new name: ')
+
+            os.rename(f'{config["projectDir"]}/{prj.name}',f'{config["projectDir"]}/{new_name}')
+
+            prj.name = new_name
+
+            createProjectJson(prj)
+
+            input(f'\nContinue...')   
 
         else:
             input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')

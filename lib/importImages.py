@@ -1,6 +1,5 @@
 import os, shutil
 
-# Create image masks from the project object
 def importImages(prj):
     if not os.path.isdir('projects/' + prj.name + '/img'):
         os.makedirs('projects/' + prj.name + '/img')

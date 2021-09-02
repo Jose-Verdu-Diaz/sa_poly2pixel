@@ -1,6 +1,5 @@
 import os, shutil
 
-# Create image masks from the project object
 def importAnnotations(prj):
     if not os.path.isdir('projects/' + prj.name + '/annotations'):
         os.makedirs('projects/' + prj.name + '/annotations')
