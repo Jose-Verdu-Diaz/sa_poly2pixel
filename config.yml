@@ -1,2 +1,3 @@
-debug: true
+debug: false
+exportedSaDir: /home/pepv/Practiques/Segm/MRIs/Tracked
 projectDir: /home/pepv/Practiques/Segm/Software/sa_poly2pixel/projects

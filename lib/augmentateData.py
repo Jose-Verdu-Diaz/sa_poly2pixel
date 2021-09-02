@@ -85,8 +85,9 @@ def augmentateData(prj, config):
         printHeader()
         printLoadedProject(prj)
 
-        print(f'{bcolors.BOLD}Nº of images:{bcolors.ENDC} {len(prj.images)}')
-        print(f'{bcolors.BOLD}Permutations:{bcolors.ENDC} {permutations}')
+        print(f'{bcolors.BOLD} Nº of input images:{bcolors.ENDC} {len(prj.images)}')
+        print(f'{bcolors.BOLD}       Permutations:{bcolors.ENDC} {permutations}')
+        print(f'{bcolors.BOLD}Nº of output images:{bcolors.ENDC} {len(prj.images) * permutations}')
 
         print("""
             \n

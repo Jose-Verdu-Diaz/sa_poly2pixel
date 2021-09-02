@@ -1,6 +1,7 @@
-import os, sys, cv2
+import os, sys, cv2, shutil
 import numpy as np
 from PIL import Image, ImageDraw
+from fpdf import FPDF
 
 from lib.aux import *
 from lib.showSequence import *
@@ -8,6 +9,34 @@ from lib.aux import *
 
 
 def ap_checkErrors(prj):
+
+    if not os.path.exists(f'projects/{prj.name}/logs'):
+        os.makedirs(f'projects/{prj.name}/logs')
+
+    if not os.path.exists(f'projects/{prj.name}/logs/READ_ME.pdf'):
+        #shutil.copyfile('lib/analyseProject_functions/CheckErrors_Documentation.txt', f'projects/{prj.name}/logs/READ_ME.txt')
+
+        # save FPDF() class into 
+        # a variable pdf
+        pdf = FPDF()   
+        
+        # Add a page
+        pdf.add_page()
+        
+        # set style and size of font 
+        # that you want in the pdf
+        pdf.set_font('Courier', size = 11)
+        
+        # open the text file in read mode
+        f = open('lib/analyseProject_functions/CheckErrors_Documentation.txt', 'r')
+        
+        # insert the texts in pdf
+        for x in f:
+            pdf.cell(w=0, h=5, txt = x, ln = 1, align = 'L')
+        
+        # save the pdf with name .pdf
+        pdf.output(f'projects/{prj.name}/logs/READ_ME.pdf')  
+
     while True:
         os.system("clear")
         printHeader()
@@ -19,6 +48,7 @@ def ap_checkErrors(prj):
             ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
             ┃ 1 : Search class errors        ┃
             ┃ 2 : Search incoherence errors  ┃
+            ┃ 3 : Search displacement errors ┃
             ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
             
             0 : Exit""")
@@ -36,16 +66,23 @@ def ap_checkErrors(prj):
             if not os.path.exists(f'projects/{prj.name}/logs/repeated_img'):
                 os.makedirs(f'projects/{prj.name}/logs/repeated_img')
 
+            dirs = sorted(os.listdir(f'projects/{prj.name}/individual'))
+            files_aux= sorted(os.listdir(f'projects/{prj.name}/individual/{dirs[0]}'))
+            printProgressBar(0, len(dirs)*len(files_aux), prefix = 'Analysing individual masks:', suffix = 'Complete', length = 50)
+
             with open(f'projects/{prj.name}/logs/repeated_class.txt', 'w') as log:
-                for cls in sorted(os.listdir(f'projects/{prj.name}/individual')):
+
+                for i,cls in enumerate(dirs):
+             
                     error_flag = False
 
-                    for i,file in enumerate(sorted(os.listdir(f'projects/{prj.name}/individual/{cls}'))):
+                    files= sorted(os.listdir(f'projects/{prj.name}/individual/{cls}'))
+                    for j,file in enumerate(files):
                         img = cv2.imread(f'projects/{prj.name}/individual/{cls}/{file}',cv2.IMREAD_GRAYSCALE)
                         contours, hierarchy = cv2.findContours(img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 
                         if len(contours) > 1:
-                            print(f'{bcolors.FAIL}{cls} ## {file} ## {len(contours)} ## {bcolors.ENDC}')
+                            print(f'\r{bcolors.FAIL}{cls} ## {file} ## {len(contours)}{bcolors.ENDC}{"".join([*(" " for k in range(68))])}')
 
                             if not error_flag: 
                                 log.write(f'### {prj.classes[int(cls)-1].name} ({cls}) ###\n')
@@ -74,9 +111,12 @@ def ap_checkErrors(prj):
                             cv2.imwrite(f'projects/{prj.name}/logs/repeated_img/{file}', result)
 
                             log.write('\n')
-                        if i+1 == len(sorted(os.listdir(f'projects/{prj.name}/individual/{cls}'))) and error_flag: log.write('\n')
 
-            input('Continue')
+                        printProgressBar(i*len(files) + j + 1, len(dirs)*len(files), prefix = 'Analysing individual masks:', suffix = 'Complete', length = 50)
+
+                        if j+1 == len(sorted(os.listdir(f'projects/{prj.name}/individual/{cls}'))) and error_flag: log.write('\n')
+
+            input('\nContinue')
 
         elif choice == '2':
 
@@ -178,6 +218,79 @@ def ap_checkErrors(prj):
                         printProgressBar(i*len(files) + j + 1, len(dirs)*len(files), prefix = 'Analysing individual masks:', suffix = 'Complete', length = 50)
 
                     if j+1 == len(sorted(os.listdir(f'projects/{prj.name}/individual/{cls}'))) and error_flag: log.write('\n')
+
+            input('\nContinue')
+
+        elif choice == '3': 
+
+            if not os.path.exists(f'projects/{prj.name}/logs/displacement_img'):
+                os.makedirs(f'projects/{prj.name}/logs/displacement_img')
+
+            with open(f'projects/{prj.name}/logs/displacement_class.txt', 'w') as log:
+                dirs = sorted(os.listdir(f'projects/{prj.name}/individual'))
+
+                files_aux= sorted(os.listdir(f'projects/{prj.name}/individual/{dirs[0]}'))
+                printProgressBar(0, len(dirs)*len(files_aux), prefix = 'Analysing individual masks:', suffix = 'Complete', length = 50)
+
+                for i,cls in enumerate(dirs):                   
+                    error_flag = False
+
+                    files= sorted(os.listdir(f'projects/{prj.name}/individual/{cls}'))
+                    for j,file in enumerate(files):
+
+                        pre_img = cv2.imread(f'projects/{prj.name}/individual/{cls}/{files[j-1]}',cv2.IMREAD_GRAYSCALE)
+
+                        current_img = cv2.imread(f'projects/{prj.name}/individual/{cls}/{file}',cv2.IMREAD_GRAYSCALE)
+
+                        contours_pre_img, hierarchy = cv2.findContours(pre_img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+                        contours_current_img, hierarchy = cv2.findContours(current_img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+
+                        if j==0 or len(contours_pre_img) == 0 or len(contours_current_img) == 0: 
+                            printProgressBar(i*len(files) + j + 1, len(dirs)*len(files), prefix = 'Analysing individual masks:', suffix = 'Complete', length = 50)
+                            continue
+
+                        else:
+                            overlap = cv2.bitwise_and(pre_img,current_img)
+                            contours_overlap, hierarchy = cv2.findContours(overlap,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+
+                            if len(contours_overlap)==0: overlap_percentage = 0.00
+                            else:
+                                area_overlap = cv2.countNonZero(overlap)
+                                area_current_img = cv2.countNonZero(current_img)
+
+                                overlap_percentage = round((area_overlap / area_current_img) * 100, 2)
+
+                            if overlap_percentage < 5 and error_flag: error_flag = not error_flag
+                            elif overlap_percentage < 5 and not error_flag:
+
+                                print(f'\r{bcolors.FAIL}{cls} ## {file} ## {overlap_percentage}%{bcolors.ENDC}{"".join([*(" " for k in range(69))])}')
+
+                                im = cv2.imread(f'projects/{prj.name}/img/{file.split("_")[0]}.jpg',cv2.IMREAD_GRAYSCALE)
+                                im_rgb = cv2.cvtColor(im, cv2.COLOR_GRAY2BGR)
+
+                                im_rgb_copy = im_rgb.copy()
+
+                                for cont in contours_pre_img: im_rgb_copy = cv2.drawContours(im_rgb_copy, [cont], -1, (0, 0, 255), -1)
+                                for cont in contours_current_img: im_rgb_copy = cv2.drawContours(im_rgb_copy, [cont], -1, (255, 0, 0), -1)
+                                for cont in contours_overlap: im_rgb_copy = cv2.drawContours(im_rgb_copy, [cont], -1, (0, 255, 0), -1)
+
+                                alpha = 0.8
+                                filled = cv2.addWeighted(im_rgb, alpha, im_rgb_copy, 1-alpha, 0)
+
+                                for cont in contours_pre_img: filled = cv2.drawContours(filled, [cont], -1, (0, 0, 255), 0)
+                                for cont in contours_current_img: filled = cv2.drawContours(filled, [cont], -1, (255, 0, 0), 0)
+                                for cont in contours_overlap: filled = cv2.drawContours(filled, [cont], -1, (0, 255, 0), 0)
+
+                                image = cv2.putText(filled, f'{overlap_percentage}%', (40, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+
+                                log.write(f'\t{file}\t[{overlap_percentage}%]')
+
+                                cv2.imwrite(f'projects/{prj.name}/logs/displacement_img/{file}', filled)
+
+                                log.write('\n')
+
+                        printProgressBar(i*len(files) + j + 1, len(dirs)*len(files), prefix = 'Analysing individual masks:', suffix = 'Complete', length = 50)
+                            
 
             input('\nContinue')
 

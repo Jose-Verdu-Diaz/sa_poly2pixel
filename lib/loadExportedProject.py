@@ -9,7 +9,7 @@ from lib.models.polygon import Polygon
 from lib.models.image_ import Image_
 
 # Show file browser and load SuperAnnotate exported project (create project object)
-def loadExportedProject():
+def loadExportedProject(config):
 
     prj = Project()
     
@@ -17,7 +17,7 @@ def loadExportedProject():
     root = tk.Tk()
     root.withdraw()
 
-    prj.projectDir = filedialog.askdirectory()
+    prj.projectDir = filedialog.askdirectory(mustexist=True, initialdir=config['exportedSaDir'])
 
     if not isinstance(prj.projectDir, str) or prj.projectDir == '': 
         input(f'\n{bcolors.FAIL}No project selected, press a key to continue...{bcolors.ENDC}')
@@ -35,9 +35,18 @@ def loadExportedProject():
 
     _images = []
 
+    temp_ids = []
 
+    # Load classes.json
+    with open(classFile) as f:
+        data = json.load(f)
 
-    #if f.strip('.json') in [i.strip('.jpg') for i in imageFiles] :
+        classes = []
+
+        for d in data:
+            classes.append(Class_(d["color"],d["id"],d["name"]))
+            temp_ids.append(d["id"])
+        prj.classes = classes
 
     for f in maskFiles:
 
@@ -49,6 +58,11 @@ def loadExportedProject():
 
             # Foreach polygon
             for poly in data['instances']:
+
+                if not int(poly['classId']) in temp_ids: 
+                    input(f'\n{bcolors.FAIL}Class with id {poly["classId"]} does not exist, polygon ignored, continue...{bcolors.ENDC}')
+                    continue
+
                 pointArray = poly['points']
                 points = []
                 # Group points in pairs
@@ -60,15 +74,6 @@ def loadExportedProject():
             _images.append(Image_(None,f.strip('.json').strip('.jpg'),prj.projectDir + '/img/' + f.strip('.json'), None, polygons))               
     prj.images = _images
 
-    # Load classes.json
-    with open(classFile) as f:
-        data = json.load(f)
 
-        classes = []
-
-        for d in data:
-            classes.append(Class_(d["color"],d["id"],d["name"]))
-        
-        prj.classes = classes
         
     return prj
