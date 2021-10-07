@@ -16,20 +16,26 @@ def ap_images(prj):
         nameList = []
         nPolyList = []
 
+        # Stores tick and cross symbols for the menu 
+        tick = dict([(True, f'{bcolors.OKGREEN}{bcolors.BOLD}✔{bcolors.ENDC}'), (False, f'{bcolors.FAIL}{bcolors.BOLD}✘{bcolors.ENDC}')])
+
         for i,img in enumerate(prj.images):
             idList.append(str(i))
             nameList.append(str(img.name))
             nPolyList.append(str(len(img.polygons)))
         printTable(['Id','Name','Nº of poly'],[idList,nameList,nPolyList])
 
+        print(f'\nSave animation: {"".join(tick[save])}')
+
         print("""
             \nChoose an option:
 
             ┏━━━━━━━━━━━━━━━━━━━━━━━┓
             ┃ 1 : Show images       ┃
-            ┃                       ┃
             ┗━━━━━━━━━━━━━━━━━━━━━━━┛
             
+            2 : Save animation
+
             0 : Exit""")
 
         try:
@@ -43,6 +49,9 @@ def ap_images(prj):
 
         elif choice == '1':
             showSequence(prj,'img', None, 50, save)
+
+        elif choice == '2':
+            save = not save
 
         else:
             input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')
