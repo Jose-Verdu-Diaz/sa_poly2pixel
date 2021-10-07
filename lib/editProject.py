@@ -1,8 +1,7 @@
 import os, json
 
-from lib.aux import *
+from lib.auxiliary import *
 from lib.showSequence import *
-from lib.aux import *
 from lib.createProjectJson import *
 
 

@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import filedialog
 import json, os
 
-from lib.aux import *
+from lib.auxiliary import *
 from lib.models.project import Project
 from lib.models.class_ import Class_
 from lib.models.polygon import Polygon

@@ -2,12 +2,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import cv2, os
+from datetime import datetime
 
 
-def showSequence(dir, classId, interval):
+def showSequence(prj, dir, classId, interval, save=False):
     ims = []
-    for file in sorted(os.listdir(dir)):
-        ims.append(cv2.imread(f'{dir}/{file}'))
+    for file in sorted(os.listdir(f'{os.getcwd()}/projects/{prj.name}/{dir}')):
+        ims.append(cv2.imread(f'{os.getcwd()}/projects/{prj.name}/{dir}/{file}'))
 
     if not classId == None:
         for i,img in enumerate(ims):
@@ -29,12 +30,11 @@ def showSequence(dir, classId, interval):
     ani = animation.ArtistAnimation(fig, sequence, interval=interval, blit=True, repeat_delay=0)
 
     
-    # Save video
-    '''
-    Writer = animation.writers['ffmpeg']
-    writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
-    ani.save('Masks.mp4', writer=writer)
-    '''
+    if save:
+        timestamp = datetime.timestamp(datetime.now())
+        Writer = animation.writers['ffmpeg']
+        writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
+        ani.save(f'{timestamp}.mp4', writer=writer)
     
     plt.show()
 

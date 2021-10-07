@@ -1,9 +1,12 @@
 import os
-from lib.aux import *
+from lib.auxiliary import *
 
 from lib.showSequence import *
 
 def ap_images(prj):
+
+    save = False
+
     while True:
         os.system("clear")
         printHeader()
@@ -39,7 +42,7 @@ def ap_images(prj):
             return
 
         elif choice == '1':
-            showSequence(f'{prj.projectDir}/img/', None, 50)
+            showSequence(prj,'img', None, 50, save)
 
         else:
             input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')

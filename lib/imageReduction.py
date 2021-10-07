@@ -1,5 +1,5 @@
 import os
-from lib.aux import *
+from lib.auxiliary import *
 from lib.analyseProject_functions.analyseProject_Classes import *
 from lib.analyseProject_functions.analyseProject_Images import *
 from lib.analyseProject_functions.analyseProject_CheckErrors import *

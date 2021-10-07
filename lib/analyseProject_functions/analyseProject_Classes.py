@@ -1,8 +1,10 @@
 import os
-from lib.aux import *
+from lib.auxiliary import *
 from lib.showSequence import *
 
 def ap_classes(prj):
+
+    save = False
 
     while True:
         os.system("clear")
@@ -13,6 +15,9 @@ def ap_classes(prj):
         nameList = []
         colorList = []
 
+        # Stores tick and cross symbols for the menu 
+        tick = dict([(True, f'{bcolors.OKGREEN}{bcolors.BOLD}✔{bcolors.ENDC}'), (False, f'{bcolors.FAIL}{bcolors.BOLD}✘{bcolors.ENDC}')])
+
         for cls in prj.classes:
             idList.append(str(cls.id))
             nameList.append(str(cls.name))
@@ -22,6 +27,8 @@ def ap_classes(prj):
 
         printTable(['Id','Name','Color'],[idList,nameList,''],colorList)
 
+        print(f'\nSave animation: {"".join(tick[save])}')
+
         print("""
             \nChoose an option:
 
@@ -30,6 +37,8 @@ def ap_classes(prj):
             ┃ 2 : Show segmentation (Color) ┃
             ┃ 3 : Show class                ┃
             ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+            4 : Save animation
             
             0 : Exit""")
 
@@ -43,15 +52,18 @@ def ap_classes(prj):
             return
 
         elif choice == '1':
-            showSequence(f'{os.getcwd()}/projects/{prj.name}/masks', None, 50)
+            showSequence(prj,'masks', None, 50, save)
         
         elif choice == '2':
-            showSequence(f'{os.getcwd()}/projects/{prj.name}/masks_color', None, 50)
+            showSequence(prj,'masks_color', None, 50, save)
 
         elif choice == '3': 
             classId = int(input('\nSelect a class Id: '))
 
-            showSequence(f'{os.getcwd()}/projects/{prj.name}/masks', classId, 50)
+            showSequence(prj,'masks', classId, 50, save)
+
+        elif choice == '4':
+            save = not save
 
         else:
             input(f'\n{bcolors.FAIL}Unexpected option, press a key to continue...{bcolors.ENDC}')

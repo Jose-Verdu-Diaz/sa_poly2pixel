@@ -3,7 +3,7 @@
 ######################################################################
 import os, yaml, argparse
 
-from lib.aux import *
+from lib.auxiliary import *
 from lib.createMask import *
 from lib.createProjectJson import *
 from lib.loadExportedProject import *

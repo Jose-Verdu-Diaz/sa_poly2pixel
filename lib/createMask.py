@@ -2,7 +2,7 @@ import os, cv2, json
 from PIL import Image, ImageDraw
 import numpy as np
 
-from lib.aux import *
+from lib.auxiliary import *
 from lib.models.project import Project
 from lib.models.class_ import Class_
 from lib.models.polygon import Polygon

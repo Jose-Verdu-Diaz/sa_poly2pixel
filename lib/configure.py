@@ -1,7 +1,7 @@
 import os, yaml, shutil
 import tkinter as tk
 from tkinter import filedialog
-from lib.aux import *
+from lib.auxiliary import *
 
 def configure(prj,config):
     while True:

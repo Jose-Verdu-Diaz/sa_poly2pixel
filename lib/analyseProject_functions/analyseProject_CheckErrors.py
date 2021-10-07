@@ -3,10 +3,8 @@ import numpy as np
 from PIL import Image, ImageDraw
 from fpdf import FPDF
 
-from lib.aux import *
+from lib.auxiliary import *
 from lib.showSequence import *
-from lib.aux import *
-
 
 def ap_checkErrors(prj):
 
