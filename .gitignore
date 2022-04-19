@@ -129,5 +129,5 @@ dmypy.json
 
 projects/
 lib/remoteFunctions/
-lib/blobDetection/
+lib/experiments/
 config.yml

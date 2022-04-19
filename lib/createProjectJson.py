@@ -1,10 +1,4 @@
-import os, sys, json
-from PIL import Image, ImageDraw
-
-from lib.models.project import Project
-from lib.models.class_ import Class_
-from lib.models.polygon import Polygon
-from lib.models.image_ import Image_
+import os, json
 
 # Create a json file from projec object
 def createProjectJson(prj):

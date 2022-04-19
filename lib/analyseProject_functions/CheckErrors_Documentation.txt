@@ -54,13 +54,23 @@
 
                     a                                   b
             · · · · · · · · ·                   · · · · · · · · ·
-            · · C C C C C · ·                   · · · C C C · · · 
-            · C C C C C C C ·                   · · C C C C C · ·
-            · C C C C C C C ·                   · · C C C C C · ·
+            · · · · C · · · ·                   · · · C C C · · · 
+            · · · C C C · · ·                   · · C C C C C · ·
+            · C C C C C C · ·                   · · C C C C C · ·
             · C C C C C C · ·                   · · C C C C · · ·
             · C C C C C · · ·                   · · · C C · · · ·
             · · C C C · · · ·                   · · · · · · · · ·
             · · · · · · · · ·                   · · · · · · · · ·
+            
+				                    a U b
+			                  · · · · · · · · ·
+			                  · · · · C · · · ·
+			                  · · · C C C · · ·
+                              · · C C C C C · ·
+                              · · C C C C · · ·
+                              · · · C C · · · ·
+                              · · · · · · · · ·
+                              · · · · · · · · ·
 
         If less than 5% of the pixels are shared, the program raises an error.
         The error will be followed with the amount of shared pixels in the from

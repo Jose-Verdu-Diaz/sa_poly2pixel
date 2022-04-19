@@ -2,11 +2,11 @@ import tkinter as tk
 from tkinter import filedialog
 import json
 
-from lib.auxiliary import *
-from lib.models.project import Project
-from lib.models.class_ import Class_
-from lib.models.polygon import Polygon
-from lib.models.image_ import Image_
+from lib.auxiliary import bcolors
+from lib.models.Image import Image
+from lib.models.Muscle import Muscle
+from lib.models.Project import Project
+from lib.models.Polygon import Polygon
 
 # Show file browser and load SuperAnnotate project (create project object)
 def loadProject():
@@ -36,7 +36,7 @@ def loadProject():
         images = []
 
         for d in data:
-            images.append(Image_(d["srcPath"],d["name"],d["imagePath"],d["thumbPath"]))
+            images.append(Image(d["srcPath"],d["name"],d["imagePath"],d["thumbPath"]))
 
         prj.images = images
 
@@ -47,7 +47,7 @@ def loadProject():
         classes = []
 
         for d in data:
-            classes.append(Class_(d["color"],d["id"],d["name"]))
+            classes.append(Muscle(d["color"],d["id"],d["name"]))
         
         prj.classes = classes
 

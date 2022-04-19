@@ -1,12 +1,11 @@
-import os, cv2, json
+import os
+import cv2
+import json
 from PIL import Image, ImageDraw
 import numpy as np
 
-from lib.auxiliary import *
-from lib.models.project import Project
-from lib.models.class_ import Class_
-from lib.models.polygon import Polygon
-from lib.models.image_ import Image_
+from lib.auxiliary import printHeader, printLoadedProject, bcolors, printProgressBar
+from lib.models.Muscle import Muscle
 
 # Create image masks from the project object
 def createMask(prj):
@@ -163,7 +162,7 @@ def createMask(prj):
                 data = json.load(f)
                 classes = []
 
-                for d in data: classes.append(Class_(d["color"],d["id"],d["name"]))
+                for d in data: classes.append(Muscle(d["color"],d["id"],d["name"]))
 
             if not os.path.exists(f'projects/{prj.name}/img'):
                 input(f'\n{bcolors.FAIL}Import images first. Continue...{bcolors.ENDC}')

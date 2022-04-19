@@ -1,12 +1,14 @@
+import os
+import json
 import tkinter as tk
 from tkinter import filedialog
-import os, json
 
-from lib.auxiliary import *
-from lib.models.project import Project
-from lib.models.class_ import Class_
-from lib.models.polygon import Polygon
-from lib.models.image_ import Image_
+from lib.auxiliary import bcolors
+from lib.models.Image import Image
+from lib.models.Muscle import Muscle
+from lib.models.Project import Project
+from lib.models.Polygon import Polygon
+
 
 # Show file browser and load SuperAnnotate exported project (create project object)
 def loadExportedProject(config):
@@ -44,7 +46,7 @@ def loadExportedProject(config):
         classes = []
 
         for d in data:
-            classes.append(Class_(d["color"],d["id"],d["name"]))
+            classes.append(Muscle(d["color"],d["id"],d["name"]))
             temp_ids.append(d["id"])
         prj.classes = classes
 
@@ -71,7 +73,7 @@ def loadExportedProject(config):
 
                 polygons.append(Polygon(poly['classId'], points))
             
-            _images.append(Image_(None,f.strip('.json').strip('.jpg'),prj.projectDir + '/img/' + f.strip('.json'), None, polygons))               
+            _images.append(Image(None,f.strip('.json').strip('.jpg'),prj.projectDir + '/img/' + f.strip('.json'), None, polygons))               
     prj.images = _images
 
 

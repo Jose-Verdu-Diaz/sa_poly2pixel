@@ -1,23 +1,24 @@
 ######################################################################
 ##            github.com/Jose-Verdu-Diaz/sa_poly2pixel              ##
 ######################################################################
-import os, yaml, argparse
+import os
+import yaml
+import argparse
 
-from lib.auxiliary import *
-from lib.createMask import *
-from lib.createProjectJson import *
-from lib.loadExportedProject import *
-from lib.loadProject import *
-from lib.loadPoly2PixProject import *
-from lib.projectExplorer import *
-from lib.analyseProject import *
-from lib.showSequence import *
-from lib.augmentateData import *
-from lib.importImages import *
-from lib.importAnnotations import *
-from lib.configure import *
-from lib.imageReduction import *
-from lib.editProject import *
+from lib.auxiliary import bcolors, printHeader, printLoadedProject
+from lib.createMask import createMask
+from lib.createProjectJson import createProjectJson
+from lib.loadExportedProject import loadExportedProject
+from lib.loadProject import loadProject
+from lib.loadPoly2PixProject import loadPoly2PixProject
+from lib.projectExplorer import projectExplorer
+from lib.analyseProject import analyseProject
+#from lib.augmentateData import augmentateData
+from lib.importImages import  importImages
+from lib.importAnnotations import importAnnotations
+from lib.configure import configure
+from lib.imageReduction import imageReduction
+from lib.editProject import editProject
 
 def main(args):
     if not os.path.exists('config.yml'):
@@ -146,7 +147,9 @@ def main(args):
             if project == None:
                 input(f'\n{bcolors.FAIL}There is no project loaded, press a key to continue...{bcolors.ENDC}')
                 pass
-            else: augmentateData(project, config)
+            else: 
+                #augmentateData(project, config)
+                input(f'\n{bcolors.FAIL}Option not available, press a key to continue...{bcolors.ENDC}')
         
         elif choice == '8':
             if project == None:
